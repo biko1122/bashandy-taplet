@@ -7,7 +7,13 @@
  * ==========================================================================
  */
 
-const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:4000').replace(/\/$/, '')
+/* عنوان الـ API — بيتحدد لوحده:
+   - النسخة المرفوعة (الإنتاج) → السيرفر اللايف على Railway
+   - التطوير المحلي → localhost:4000
+   ولو حبيت تغيّره من غير تعديل كود، حط VITE_API_URL وهو بياخد الأولوية. */
+const PRODUCTION_API = 'https://bashandy-backend-production.up.railway.app'
+const DEFAULT_API = import.meta.env.PROD ? PRODUCTION_API : 'http://localhost:4000'
+const BASE_URL = (import.meta.env.VITE_API_URL || DEFAULT_API).replace(/\/$/, '')
 const TOKEN_KEY = 'bashandy.tablet.token'
 const USER_KEY = 'bashandy.tablet.user'
 
