@@ -1,0 +1,690 @@
+/**
+ * ==========================================================================
+ *  ستايل شاشة التابلت
+ * --------------------------------------------------------------------------
+ *  المبادئ:
+ *   - أزرار كبيرة (48px+) — الموظف بيدوس بصباعه وإيده مشغولة
+ *   - ألوان الحالات واضحة من بعيد: جديد كهرماني بينبض، جاهز أخضر…
+ *   - خلفية دافية مريحة لشاشة مفتوحة طول اليوم
+ * ==========================================================================
+ */
+
+:root {
+  --bg: #f4efe6;
+  --surface: #fffdf8;
+  --surface-2: #f7f2e9;
+  --border: #e3d9c8;
+  --border-strong: #cbbda5;
+  --text: #221b12;
+  --text-soft: #55483a;
+  --muted: #86776226;
+  --muted-text: #867762;
+
+  --brand: #17120c;
+  --gold: #c4892b;
+
+  /* ألوان الحالات */
+  --c-pending: #b45309;
+  --c-pending-bg: #fef3c7;
+  --c-accepted: #0e7490;
+  --c-accepted-bg: #cffafe;
+  --c-preparing: #c2410c;
+  --c-preparing-bg: #ffedd5;
+  --c-ready: #15803d;
+  --c-ready-bg: #dcfce7;
+  --c-done: #57534e;
+  --c-done-bg: #e7e5e4;
+  --c-cancel: #b91c1c;
+  --c-cancel-bg: #fee2e2;
+
+  --wa: #16a34a;
+
+  --radius: 12px;
+  --radius-lg: 16px;
+  --shadow: 0 6px 24px rgba(34, 27, 18, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: 0;
+  background: none;
+  color: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.splash {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  font-size: 1.2rem;
+  color: var(--muted-text);
+}
+
+/* ============================== الأزرار ============================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 50px;
+  padding: 0.7rem 1.2rem;
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 1rem;
+  transition: transform 120ms ease, filter 120ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background: var(--brand);
+  color: #f5e7cc;
+}
+
+/* ============================== الدخول ============================== */
+
+.login {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 1.5rem;
+}
+
+.login__box {
+  width: min(100%, 400px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 2.2rem 1.8rem;
+  display: grid;
+  gap: 0.9rem;
+  text-align: center;
+}
+
+.login__logo {
+  margin: 0 auto;
+  border-radius: 50%;
+}
+
+.login__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.login__sub {
+  font-size: 0.9rem;
+  color: var(--muted-text);
+  margin-bottom: 0.5rem;
+}
+
+.login__field {
+  display: grid;
+  gap: 0.3rem;
+  text-align: start;
+}
+
+.login__field span {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.login__field input {
+  min-height: 50px;
+  padding: 0.6rem 0.9rem;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border-strong);
+  background: var(--bg);
+  font: inherit;
+  font-size: 1rem;
+}
+
+.login__field input:focus {
+  outline: 2.5px solid var(--gold);
+  outline-offset: 1px;
+  border-color: var(--gold);
+}
+
+.login__error {
+  background: var(--c-cancel-bg);
+  color: var(--c-cancel);
+  border-radius: var(--radius);
+  padding: 0.6rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.login__submit {
+  margin-top: 0.4rem;
+}
+
+/* ============================== الهيدر ============================== */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.7rem 1.1rem;
+  background: var(--brand);
+  color: #f0e6d2;
+  box-shadow: var(--shadow);
+}
+
+.topbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.topbar__brand img {
+  border-radius: 50%;
+}
+
+.topbar__brand b {
+  display: block;
+  font-size: 1.05rem;
+  line-height: 1.3;
+}
+
+.topbar__brand small {
+  color: #b5a586;
+  font-size: 0.78rem;
+}
+
+/* -------- التبويبات -------- */
+
+.tabs {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  margin-inline: auto;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 46px;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #cfc2a8;
+  border: 1.5px solid transparent;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.tab:hover {
+  color: #f0e6d2;
+}
+
+.tab.is-on {
+  background: #f0e6d2;
+  color: var(--brand);
+}
+
+.tab__count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 26px;
+  height: 26px;
+  padding-inline: 0.35rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.tab.is-on .tab__count {
+  background: var(--brand);
+  color: #f0e6d2;
+}
+
+/* تبويب "جديد" لما فيه أوردرات مستنية — بينبض */
+.tab--alert:not(.is-on) {
+  color: #fbbf24;
+  border-color: #fbbf24;
+  animation: tab-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes tab-pulse {
+  50% {
+    background: rgba(251, 191, 36, 0.16);
+  }
+}
+
+/* -------- أدوات الهيدر -------- */
+
+.topbar__tools {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.tool {
+  display: grid;
+  place-items: center;
+  min-width: 46px;
+  height: 46px;
+  padding-inline: 0.7rem;
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 1.15rem;
+  opacity: 0.55;
+  transition: opacity 150ms ease, background 150ms ease;
+}
+
+.tool.is-on {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.tool--exit {
+  font-size: 0.9rem;
+  font-weight: 600;
+  opacity: 1;
+  color: #e7b9b0;
+}
+
+/* ============================== التنبيهات ============================== */
+
+.alert {
+  margin: 0.8rem 1.1rem 0;
+  padding: 0.7rem 1rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  animation: rise 200ms ease both;
+}
+
+.alert--offline {
+  background: var(--c-cancel-bg);
+  color: var(--c-cancel);
+}
+
+.alert--ok {
+  background: var(--c-ready-bg);
+  color: var(--c-ready);
+}
+
+.alert--err {
+  background: var(--c-cancel-bg);
+  color: var(--c-cancel);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+/* ============================== الشبكة ============================== */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 1rem;
+  padding: 1.1rem;
+  align-items: start;
+}
+
+.empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 4rem 1rem;
+  font-size: 1.15rem;
+  color: var(--muted-text);
+}
+
+/* ============================== كارت الأوردر ============================== */
+
+.ocard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  animation: rise 240ms ease both;
+}
+
+/* شريط علوي بلون الحالة */
+.ocard::before {
+  content: '';
+  display: block;
+  height: 6px;
+}
+
+.ocard--pending::before {
+  background: var(--c-pending);
+}
+
+/* الأوردر الجديد كله بيلفت النظر */
+.ocard--pending {
+  border-color: var(--c-pending);
+  box-shadow: 0 0 0 1px var(--c-pending), var(--shadow);
+}
+
+.ocard--accepted::before {
+  background: var(--c-accepted);
+}
+.ocard--preparing::before {
+  background: var(--c-preparing);
+}
+.ocard--ready::before {
+  background: var(--c-ready);
+}
+.ocard--completed::before {
+  background: var(--c-done);
+}
+.ocard--cancelled::before {
+  background: var(--c-cancel);
+}
+
+.ocard--completed,
+.ocard--cancelled {
+  opacity: 0.75;
+}
+
+/* -------- الهيدر -------- */
+
+.ocard__head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  padding: 0.8rem 1rem 0.55rem;
+}
+
+.ocard__number {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.ocard__badges {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.badge {
+  padding: 0.18rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.badge--pending {
+  background: var(--c-pending-bg);
+  color: var(--c-pending);
+}
+.badge--accepted {
+  background: var(--c-accepted-bg);
+  color: var(--c-accepted);
+}
+.badge--preparing {
+  background: var(--c-preparing-bg);
+  color: var(--c-preparing);
+}
+.badge--ready {
+  background: var(--c-ready-bg);
+  color: var(--c-ready);
+}
+.badge--completed {
+  background: var(--c-done-bg);
+  color: var(--c-done);
+}
+.badge--cancelled {
+  background: var(--c-cancel-bg);
+  color: var(--c-cancel);
+}
+
+.badge--type,
+.badge--source {
+  background: var(--surface-2);
+  color: var(--text-soft);
+  border: 1px solid var(--border);
+}
+
+.ocard__time {
+  margin-inline-start: auto;
+  font-size: 0.82rem;
+  color: var(--muted-text);
+  white-space: nowrap;
+}
+
+.ocard__time b {
+  color: var(--c-pending);
+}
+
+/* -------- العميل -------- */
+
+.ocard__customer {
+  padding: 0.55rem 1rem 0.7rem;
+  border-bottom: 1px dashed var(--border);
+  display: grid;
+  gap: 0.25rem;
+}
+
+.ocard__cname {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.ocard__phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: fit-content;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--c-accepted);
+  padding: 0.15rem 0;
+}
+
+.ocard__phone:active {
+  opacity: 0.6;
+}
+
+.ocard__address {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-soft);
+  background: var(--surface-2);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.7rem;
+}
+
+.ocard__address-label {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.ocard__address--pickup {
+  background: var(--c-ready-bg);
+  color: var(--c-ready);
+  font-weight: 600;
+}
+
+/* -------- الملاحظة — أهم حاجة متتفوتش -------- */
+
+.ocard__note {
+  margin: 0.6rem 1rem 0;
+  padding: 0.55rem 0.8rem;
+  background: var(--c-pending-bg);
+  color: var(--c-pending);
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+/* -------- الأصناف -------- */
+
+.ocard__items {
+  list-style: none;
+  padding: 0.6rem 1rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.ocard__item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+}
+
+.ocard__qty {
+  flex: none;
+  min-width: 2.2rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--gold);
+}
+
+.ocard__iname {
+  flex: 1;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.ocard__opts {
+  display: block;
+  font-style: normal;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--c-preparing);
+}
+
+.ocard__iprice {
+  flex: none;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--muted-text);
+}
+
+/* -------- الإجمالي -------- */
+
+.ocard__total {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  padding: 0.65rem 1rem;
+  border-top: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.ocard__total b {
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.ocard__total small {
+  width: 100%;
+  font-size: 0.78rem;
+  color: var(--muted-text);
+}
+
+/* -------- الأزرار -------- */
+
+.ocard__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.8rem 1rem 1rem;
+}
+
+.btn--advance {
+  flex: 1 1 auto;
+  color: #fff;
+}
+
+.btn--to-accepted {
+  background: var(--c-accepted);
+}
+.btn--to-preparing {
+  background: var(--c-preparing);
+}
+.btn--to-ready {
+  background: var(--c-ready);
+}
+.btn--to-completed {
+  background: var(--c-done);
+}
+
+.btn--wa {
+  flex: 1 1 auto;
+  background: #eafbef;
+  color: var(--wa);
+  border: 1.5px solid var(--wa);
+}
+
+.btn--cancel {
+  flex: 0 1 auto;
+  background: none;
+  color: var(--c-cancel);
+  border: 1.5px solid var(--c-cancel-bg);
+  font-weight: 600;
+}
+
+.btn--cancel.is-confirm {
+  background: var(--c-cancel);
+  color: #fff;
+  animation: rise 150ms ease;
+}
+
+/* ============================== الموبايل ============================== */
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+    padding: 0.8rem;
+  }
+
+  .topbar {
+    gap: 0.6rem;
+  }
+
+  .tabs {
+    order: 3;
+    width: 100%;
+    margin-inline: 0;
+  }
+}
