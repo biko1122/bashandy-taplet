@@ -1,12 +1,10 @@
 import { useState } from 'react'
-import { whatsappUrlFor } from '../whatsapp'
 
-/* أسماء الأزرار — فعل واضح لكل انتقال */
+/* أسماء الأزرار — المسار المتبسط: اقبل → جاهز → خرج */
 const ACTION_LABELS = {
   ACCEPTED: '✓ اقبل الأوردر',
-  PREPARING: '👨‍🍳 ابدأ التجهيز',
   READY: '🔔 جاهز',
-  COMPLETED: '✓ اتسلّم',
+  COMPLETED: '🛵 خرج من المطعم',
   CANCELLED: 'إلغاء',
 }
 
@@ -49,9 +47,6 @@ export default function OrderCard({ order, labels, transitions, onStatus, busyId
   const { time, ago } = timeInfo(order.createdAt)
   const isDelivery = order.type === 'DELIVERY'
 
-  /* بعد القبول بنوري زرار الواتساب — لحد ما الأوردر يخلص */
-  const showWhatsApp = ['ACCEPTED', 'PREPARING', 'READY'].includes(order.status)
-
   const handleAction = (status) => {
     if (status === 'CANCELLED' && !confirmCancel) {
       setConfirmCancel(true)
@@ -81,6 +76,11 @@ export default function OrderCard({ order, labels, transitions, onStatus, busyId
           {time} <b>· {ago}</b>
         </span>
       </header>
+
+      {/* مين ماسك الأوردر — مهم جدًا مع أكتر من تابلت */}
+      {order.handledBy && order.status !== 'PENDING' ? (
+        <p className="ocard__handler">👤 بيشتغل عليه: <b>{order.handledBy}</b></p>
+      ) : null}
 
       {/* ---------------- العميل: الاسم والرقم والعنوان كاملين ---------------- */}
       <div className="ocard__customer">
@@ -144,17 +144,6 @@ export default function OrderCard({ order, labels, transitions, onStatus, busyId
               {busy ? '…' : ACTION_LABELS[status]}
             </button>
           ))}
-
-        {showWhatsApp ? (
-          <a
-            className="btn btn--wa"
-            href={whatsappUrlFor(order)}
-            target="_blank"
-            rel="noreferrer noopener"
-          >
-            💬 ابعت تأكيد واتساب
-          </a>
-        ) : null}
 
         {allowed.includes('CANCELLED') ? (
           <button

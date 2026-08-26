@@ -688,3 +688,190 @@ a {
     margin-inline: 0;
   }
 }
+
+/* ============================== "بيشتغل عليه" ============================== */
+
+.ocard__handler {
+  margin: 0.35rem 1rem 0;
+  padding: 0.35rem 0.7rem;
+  border-radius: var(--radius);
+  background: var(--c-accepted-bg);
+  color: var(--c-accepted);
+  font-size: 0.85rem;
+  width: fit-content;
+}
+
+.tool--wide {
+  font-size: 0.92rem;
+  font-weight: 700;
+  padding-inline: 0.9rem;
+  opacity: 1;
+}
+
+/* ============================== لوحة الأسعار ============================== */
+
+.prices {
+  padding: 1.1rem;
+  max-width: 860px;
+  margin-inline: auto;
+}
+
+.prices__head {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+}
+
+.prices__title {
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.prices__search {
+  min-height: 50px;
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border-strong);
+  background: var(--surface);
+  font: inherit;
+  font-size: 1rem;
+}
+
+.prices__search:focus {
+  outline: 2.5px solid var(--gold);
+  border-color: var(--gold);
+}
+
+.prices__hint {
+  font-size: 0.85rem;
+  color: var(--muted-text);
+}
+
+.pcat {
+  margin-bottom: 1.4rem;
+}
+
+.pcat__name {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  padding-bottom: 0.4rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 2px solid var(--border);
+}
+
+.pcat__count {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted-text);
+  background: var(--surface-2);
+  border-radius: 999px;
+  padding: 0.05rem 0.5rem;
+}
+
+.plist {
+  list-style: none;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.prow {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.55rem 0.8rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.prow--off {
+  opacity: 0.6;
+}
+
+.prow__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.prow__name {
+  font-weight: 600;
+  font-size: 0.98rem;
+}
+
+.prow__delta {
+  font-size: 0.72rem;
+  color: var(--c-preparing);
+  background: var(--c-preparing-bg);
+  border-radius: 999px;
+  padding: 0.05rem 0.45rem;
+}
+
+.prow__price {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex: none;
+}
+
+.prow__price input {
+  width: 88px;
+  min-height: 46px;
+  padding: 0.4rem 0.6rem;
+  text-align: center;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+
+.prow__price input:focus {
+  outline: 2.5px solid var(--gold);
+  border-color: var(--gold);
+}
+
+.prow__currency {
+  font-size: 0.8rem;
+  color: var(--muted-text);
+}
+
+.btn--save {
+  flex: none;
+  min-height: 46px;
+  background: var(--c-ready);
+  color: #fff;
+  animation: rise 150ms ease;
+}
+
+.btn--avail {
+  flex: none;
+  min-height: 46px;
+  min-width: 74px;
+  background: var(--c-ready-bg);
+  color: var(--c-ready);
+  border: 1.5px solid transparent;
+  font-size: 0.9rem;
+}
+
+.btn--avail.is-off {
+  background: var(--c-cancel-bg);
+  color: var(--c-cancel);
+}
+
+@media (max-width: 560px) {
+  .prow {
+    flex-wrap: wrap;
+  }
+
+  .prow__info {
+    flex-basis: 100%;
+  }
+}

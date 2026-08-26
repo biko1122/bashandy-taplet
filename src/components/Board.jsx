@@ -6,7 +6,7 @@ import {
   fetchStatusMeta,
   updateOrderStatus,
 } from '../api'
-import { whatsappUrlFor } from '../whatsapp'
+import AdminPrices from './AdminPrices'
 import OrderCard from './OrderCard'
 import logo from '../logo-emblem.png'
 
@@ -16,7 +16,7 @@ const POLL_MS = 8000
 const TABS = [
   { id: 'all', label: 'الكل النشط', statuses: ['PENDING', 'ACCEPTED', 'PREPARING', 'READY'] },
   { id: 'new', label: 'جديد', statuses: ['PENDING'] },
-  { id: 'working', label: 'في الشغل', statuses: ['ACCEPTED', 'PREPARING'] },
+  { id: 'working', label: 'قيد التنفيذ', statuses: ['ACCEPTED', 'PREPARING'] },
   { id: 'ready', label: 'جاهز', statuses: ['READY'] },
   { id: 'history', label: 'السجل', statuses: ['COMPLETED', 'CANCELLED'] },
 ]
@@ -53,7 +53,8 @@ export default function Board({ user, onLogout }) {
   const [flash, setFlash] = useState(null) // رسالة قصيرة بعد أي عملية
 
   const [soundOn, setSoundOn] = useState(() => localStorage.getItem('tablet.sound') !== 'off')
-  const [autoWa, setAutoWa] = useState(() => localStorage.getItem('tablet.autowa') !== 'off')
+  /* 'orders' = شاشة الأوردرات | 'prices' = لوحة الأسعار (أدمن بس) */
+  const [view, setView] = useState('orders')
 
   /* بنفتكر الأوردرات اللي شفناها — عشان نعرف الجديد ونضرب النغمة */
   const seenIds = useRef(null)
@@ -117,19 +118,9 @@ export default function Board({ user, onLogout }) {
     async (order, status) => {
       setBusyId(order.id)
 
-      /* لو ده قبول والواتساب التلقائي شغال: بنفتح النافذة **قبل** الطلب —
-         المتصفح بيسمح بفتح نوافذ من ضغطة المستخدم بس، ولو استنينا رد
-         السيرفر ممكن الـ popup blocker يمنعها. */
-      let waWindow = null
-      if (status === 'ACCEPTED' && localStorage.getItem('tablet.autowa') !== 'off') {
-        waWindow = window.open('', '_blank')
-      }
-
       try {
         const result = await updateOrderStatus(order.id, status)
         const updated = result.data
-
-        if (waWindow) waWindow.location.href = whatsappUrlFor(updated)
 
         setOrders((current) =>
           ['COMPLETED', 'CANCELLED'].includes(updated.status)
@@ -141,7 +132,6 @@ export default function Board({ user, onLogout }) {
           text: `أوردر #${updated.orderNumber} → ${meta?.labels?.[updated.status] ?? updated.status}`,
         })
       } catch (error) {
-        if (waWindow) waWindow.close()
         setFlash({ kind: 'err', text: error.message })
         /* ممكن حد تاني غيّر الحالة قبلنا — نحدّث عشان نشوف الواقع */
         loadActive()
@@ -179,12 +169,6 @@ export default function Board({ user, onLogout }) {
     if (next) beep()
   }
 
-  const toggleAutoWa = () => {
-    const next = !autoWa
-    setAutoWa(next)
-    localStorage.setItem('tablet.autowa', next ? 'on' : 'off')
-  }
-
   const handleLogout = () => {
     clearSession()
     onLogout()
@@ -204,6 +188,7 @@ export default function Board({ user, onLogout }) {
           </div>
         </div>
 
+        {view === 'orders' ? (
         <nav className="tabs" aria-label="فلترة الأوردرات">
           {TABS.map((t) => (
             <button
@@ -219,8 +204,21 @@ export default function Board({ user, onLogout }) {
             </button>
           ))}
         </nav>
+        ) : (
+          <div className="tabs" aria-hidden="true" />
+        )}
 
         <div className="topbar__tools">
+          {/* لوحة الأسعار — للأدمن الأساسي بس */}
+          {user?.role === 'ADMIN' ? (
+            <button
+              type="button"
+              className={`tool tool--wide ${view === 'prices' ? 'is-on' : ''}`}
+              onClick={() => setView(view === 'prices' ? 'orders' : 'prices')}
+            >
+              {view === 'prices' ? '📋 الأوردرات' : '💰 الأسعار'}
+            </button>
+          ) : null}
           <button
             type="button"
             className={`tool ${soundOn ? 'is-on' : ''}`}
@@ -228,14 +226,6 @@ export default function Board({ user, onLogout }) {
             title="نغمة الأوردر الجديد"
           >
             {soundOn ? '🔔' : '🔕'}
-          </button>
-          <button
-            type="button"
-            className={`tool ${autoWa ? 'is-on' : ''}`}
-            onClick={toggleAutoWa}
-            title="فتح واتساب التأكيد تلقائيًا عند القبول"
-          >
-            💬
           </button>
           <button type="button" className="tool tool--exit" onClick={handleLogout} title="خروج">
             خروج
@@ -250,7 +240,10 @@ export default function Board({ user, onLogout }) {
 
       {flash ? <div className={`alert alert--${flash.kind}`}>{flash.text}</div> : null}
 
-      {/* ------------------------------ الكروت ------------------------------ */}
+      {/* ---------------------- لوحة الأسعار (أدمن) ---------------------- */}
+      {view === 'prices' ? (
+        <AdminPrices onFlash={setFlash} />
+      ) : (
       <main className="grid">
         {shown.length === 0 ? (
           <div className="empty">
@@ -269,6 +262,7 @@ export default function Board({ user, onLogout }) {
           ))
         )}
       </main>
+      )}
     </div>
   )
 }

@@ -125,4 +125,17 @@ export const fetchHistoryOrders = () =>
 export const updateOrderStatus = (orderId, status, note) =>
   request(`/api/orders/${orderId}/status`, { method: 'PATCH', body: { status, note } })
 
+/* ------------------------ لوحة الأسعار (أدمن بس) ------------------------ */
+
+/** المنيو كامل بكل الأصناف (حتى الموقوفة) — للوحة الأسعار */
+export const fetchFullMenu = () => request('/api/menu')
+
+/** تغيير سعر صنف — بيتغيّر في قاعدة البيانات وبيظهر في الموقع فورًا */
+export const updateProductPrice = (productId, price) =>
+  request(`/api/products/${productId}`, { method: 'PATCH', body: { price } })
+
+/** إيقاف/تشغيل صنف ("خلص النهاردة") */
+export const setProductAvailability = (productId, isAvailable) =>
+  request(`/api/products/${productId}/availability`, { method: 'PATCH', body: { isAvailable } })
+
 export const API_BASE_URL = BASE_URL
