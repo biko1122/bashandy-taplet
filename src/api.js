@@ -138,4 +138,20 @@ export const updateProductPrice = (productId, price) =>
 export const setProductAvailability = (productId, isAvailable) =>
   request(`/api/products/${productId}/availability`, { method: 'PATCH', body: { isAvailable } })
 
+/* -------------------------- الشكاوي (أدمن بس) -------------------------- */
+
+/** كل الشكاوي — أحدث الأول. السيرفر بيرفضها لأي حد غير ADMIN. */
+export const fetchComplaints = (status) =>
+  request(`/api/complaints?limit=100${status ? `&status=${status}` : ''}`)
+
+/** عدّاد الشكاوي بس — طلب خفيف بنعمله دوري عشان الشارة على الزرار */
+export const fetchComplaintCounts = () => request('/api/complaints?limit=1')
+
+/** شكوى واحدة بتفاصيلها + آخر أوردرات صاحب الرقم */
+export const fetchComplaint = (id) => request(`/api/complaints/${id}`)
+
+/** تغيير حالة الشكوى و/أو إضافة ملاحظة داخلية */
+export const updateComplaint = (id, patch) =>
+  request(`/api/complaints/${id}`, { method: 'PATCH', body: patch })
+
 export const API_BASE_URL = BASE_URL

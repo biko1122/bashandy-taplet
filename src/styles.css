@@ -875,3 +875,327 @@ a {
     flex-basis: 100%;
   }
 }
+
+/* ==========================================================================
+   لوحة الشكاوي — للأدمن بس
+   ========================================================================== */
+
+/* شارة العدد على زرار الشكاوي في الهيدر */
+.tool__count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  margin-inline-start: 0.4rem;
+  padding-inline: 0.3rem;
+  border-radius: 999px;
+  background: #dc2626;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.tool--alert:not(.is-on) {
+  animation: tab-pulse 1.6s ease-in-out infinite;
+}
+
+.cmp {
+  padding: 1.1rem;
+  max-width: 900px;
+  margin-inline: auto;
+}
+
+.cmp__head {
+  display: grid;
+  gap: 0.7rem;
+  margin-bottom: 1.1rem;
+}
+
+.cmp__title {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.cmp__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.cmp__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 42px;
+  padding-inline: 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-soft);
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.cmp__tab.is-on {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+
+.cmp__tab--alert:not(.is-on) {
+  color: #b91c1c;
+  border-color: #b91c1c;
+}
+
+.cmp__tab-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding-inline: 0.3rem;
+  border-radius: 999px;
+  background: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.cmp__tab.is-on .cmp__tab-count {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.cmp__refresh {
+  justify-self: start;
+  min-height: 42px;
+}
+
+.btn--ghost {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  color: var(--text-soft);
+}
+
+/* ------------------------------- القائمة ------------------------------- */
+
+.cmp__list {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.cmp__item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-inline-start: 5px solid var(--border-strong);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.cmp__item--new {
+  border-inline-start-color: #dc2626;
+}
+.cmp__item--reviewing {
+  border-inline-start-color: #b45309;
+}
+.cmp__item--resolved {
+  border-inline-start-color: #15803d;
+  opacity: 0.75;
+}
+
+.cmp__row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto minmax(140px, auto) 1fr auto;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.85rem 1rem;
+  text-align: start;
+}
+
+.cmp__badge {
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.cmp__who {
+  display: grid;
+  line-height: 1.4;
+}
+
+.cmp__phone {
+  font-size: 0.85rem;
+  color: var(--muted-text);
+}
+
+/* لمحة من الشكوى — سطر واحد وبس */
+.cmp__peek {
+  color: var(--text-soft);
+  font-size: 0.92rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cmp__when {
+  display: grid;
+  justify-items: end;
+  gap: 0.15rem;
+  font-size: 0.82rem;
+  color: var(--muted-text);
+  white-space: nowrap;
+}
+
+.cmp__num {
+  font-weight: 700;
+  color: var(--gold);
+}
+
+@media (max-width: 720px) {
+  .cmp__row {
+    grid-template-columns: 1fr auto;
+  }
+  .cmp__peek {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ------------------------------ التفاصيل ------------------------------ */
+
+.cmp__detail {
+  padding: 0 1rem 1rem;
+  border-top: 1px dashed var(--border-strong);
+  display: grid;
+  gap: 0.9rem;
+}
+
+.cmp__loading {
+  padding: 1rem 0;
+  color: var(--muted-text);
+}
+
+.cmp__message {
+  padding-top: 0.9rem;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.cmp__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.cmp__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 44px;
+  padding-inline: 0.9rem;
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.cmp__fact {
+  font-size: 0.88rem;
+  color: var(--muted-text);
+}
+
+.cmp__orders h4 {
+  font-size: 0.88rem;
+  color: var(--muted-text);
+  margin-bottom: 0.35rem;
+}
+
+.cmp__orders ul {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.cmp__orders li {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+  padding: 0.35rem 0.6rem;
+  background: var(--surface-2);
+  border-radius: 8px;
+}
+
+.cmp__noorders {
+  font-size: 0.88rem;
+  color: var(--muted-text);
+}
+
+/* أزرار الحالة */
+.cmp__states {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cmp__state {
+  min-height: 48px;
+  padding-inline: 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-strong);
+  background: var(--surface-2);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.cmp__state.is-on {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+
+.cmp__state:disabled:not(.is-on) {
+  opacity: 0.5;
+}
+
+/* الملاحظة الداخلية */
+.cmp__note {
+  display: grid;
+  gap: 0.4rem;
+  justify-items: start;
+}
+
+.cmp__note label {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.cmp__note label small {
+  font-weight: 400;
+  color: var(--muted-text);
+}
+
+.cmp__note textarea {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-strong);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+  line-height: 1.7;
+}
+
+.cmp__note textarea:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+.cmp__note .btn--save:disabled {
+  opacity: 0.45;
+}
+
+.cmp__handler {
+  font-size: 0.85rem;
+  color: var(--muted-text);
+}

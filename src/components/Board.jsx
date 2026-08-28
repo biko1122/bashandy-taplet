@@ -4,8 +4,10 @@ import {
   fetchActiveOrders,
   fetchHistoryOrders,
   fetchStatusMeta,
+  fetchComplaintCounts,
   updateOrderStatus,
 } from '../api'
+import AdminComplaints from './AdminComplaints'
 import AdminPrices from './AdminPrices'
 import OrderCard from './OrderCard'
 import logo from '../logo-emblem.png'
@@ -53,8 +55,11 @@ export default function Board({ user, onLogout }) {
   const [flash, setFlash] = useState(null) // رسالة قصيرة بعد أي عملية
 
   const [soundOn, setSoundOn] = useState(() => localStorage.getItem('tablet.sound') !== 'off')
-  /* 'orders' = شاشة الأوردرات | 'prices' = لوحة الأسعار (أدمن بس) */
+  /* 'orders' = الأوردرات | 'prices' = الأسعار | 'complaints' = الشكاوي
+     التنتين الأخيرين للأدمن بس */
   const [view, setView] = useState('orders')
+  /* عدد الشكاوي الجديدة — بيظهر كشارة على زرار الشكاوي */
+  const [newComplaints, setNewComplaints] = useState(0)
 
   /* بنفتكر الأوردرات اللي شفناها — عشان نعرف الجديد ونضرب النغمة */
   const seenIds = useRef(null)
@@ -111,6 +116,19 @@ export default function Board({ user, onLogout }) {
   useEffect(() => {
     if (tab === 'history') loadHistory()
   }, [tab, loadHistory])
+
+  /* عدّاد الشكاوي — للأدمن بس، وبوتيرة أهدى من الأوردرات
+     (الشكوى مش حاجة بتتحل في ثواني زي الأوردر) */
+  useEffect(() => {
+    if (user?.role !== 'ADMIN') return
+    const read = () =>
+      fetchComplaintCounts()
+        .then((result) => setNewComplaints(result.newCount ?? 0))
+        .catch(() => {})
+    read()
+    const timer = setInterval(read, POLL_MS * 5)
+    return () => clearInterval(timer)
+  }, [user, view])
 
   /* ------------------------------ تغيير الحالة ------------------------------ */
 
@@ -209,15 +227,29 @@ export default function Board({ user, onLogout }) {
         )}
 
         <div className="topbar__tools">
-          {/* لوحة الأسعار — للأدمن الأساسي بس */}
+          {/* الأسعار والشكاوي — للأدمن الأساسي بس */}
           {user?.role === 'ADMIN' ? (
-            <button
-              type="button"
-              className={`tool tool--wide ${view === 'prices' ? 'is-on' : ''}`}
-              onClick={() => setView(view === 'prices' ? 'orders' : 'prices')}
-            >
-              {view === 'prices' ? '📋 الأوردرات' : '💰 الأسعار'}
-            </button>
+            <>
+              <button
+                type="button"
+                className={`tool tool--wide ${view === 'complaints' ? 'is-on' : ''} ${
+                  newComplaints > 0 ? 'tool--alert' : ''
+                }`}
+                onClick={() => setView(view === 'complaints' ? 'orders' : 'complaints')}
+              >
+                {view === 'complaints' ? '📋 الأوردرات' : '📣 الشكاوي'}
+                {newComplaints > 0 && view !== 'complaints' ? (
+                  <span className="tool__count">{newComplaints}</span>
+                ) : null}
+              </button>
+              <button
+                type="button"
+                className={`tool tool--wide ${view === 'prices' ? 'is-on' : ''}`}
+                onClick={() => setView(view === 'prices' ? 'orders' : 'prices')}
+              >
+                {view === 'prices' ? '📋 الأوردرات' : '💰 الأسعار'}
+              </button>
+            </>
           ) : null}
           <button
             type="button"
@@ -240,9 +272,11 @@ export default function Board({ user, onLogout }) {
 
       {flash ? <div className={`alert alert--${flash.kind}`}>{flash.text}</div> : null}
 
-      {/* ---------------------- لوحة الأسعار (أدمن) ---------------------- */}
+      {/* ---------------------- لوحات الأدمن ---------------------- */}
       {view === 'prices' ? (
         <AdminPrices onFlash={setFlash} />
+      ) : view === 'complaints' ? (
+        <AdminComplaints onFlash={setFlash} />
       ) : (
       <main className="grid">
         {shown.length === 0 ? (
