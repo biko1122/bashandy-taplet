@@ -5,12 +5,10 @@ import {
   fetchHistoryOrders,
   fetchStatusMeta,
   fetchComplaintCounts,
-  fetchWhatsAppCount,
   updateOrderStatus,
 } from '../api'
 import useWakeLock from '../useWakeLock'
 import AdminComplaints from './AdminComplaints'
-import WhatsAppRequests from './WhatsAppRequests'
 import AdminPrices from './AdminPrices'
 import OrderCard from './OrderCard'
 import logo from '../logo-emblem.png'
@@ -23,7 +21,6 @@ const TABS = [
   { id: 'new', label: 'جديد', statuses: ['PENDING'] },
   { id: 'working', label: 'قيد التنفيذ', statuses: ['ACCEPTED', 'PREPARING'] },
   { id: 'ready', label: 'جاهز', statuses: ['READY'] },
-  { id: 'whatsapp', label: '💬 واتساب', statuses: [] },
   { id: 'history', label: 'السجل', statuses: ['COMPLETED', 'CANCELLED'] },
 ]
 
@@ -69,8 +66,6 @@ export default function Board({ user, onLogout }) {
   const [view, setView] = useState('orders')
   /* عدد الشكاوي الجديدة — بيظهر كشارة على زرار الشكاوي */
   const [newComplaints, setNewComplaints] = useState(0)
-  /* عدد طلبات الواتساب الجديدة — بيظهر كشارة على التبويب */
-  const [newWhatsApp, setNewWhatsApp] = useState(0)
 
   /* بنفتكر الأوردرات اللي شفناها — عشان نعرف الجديد ونضرب النغمة */
   const seenIds = useRef(null)
@@ -128,31 +123,6 @@ export default function Board({ user, onLogout }) {
     if (tab === 'history') loadHistory()
   }, [tab, loadHistory])
 
-  /* عدّاد طلبات الواتساب — بيشتغل مهما كان الموظف واقف على أنهي تبويب.
-     من غير ده الشارة مبتظهرش غير لما يفتح التبويب — واللي بيفوّت أوردر.
-     وبنضرب النغمة زي الأوردر الجديد بالظبط، لأن ده أوردر برضه. */
-  const seenWhatsApp = useRef(null)
-  useEffect(() => {
-    const read = () =>
-      fetchWhatsAppCount()
-        .then((result) => {
-          const count = result.newCount ?? 0
-          if (
-            seenWhatsApp.current !== null &&
-            count > seenWhatsApp.current &&
-            localStorage.getItem('tablet.sound') !== 'off'
-          ) {
-            beep()
-          }
-          seenWhatsApp.current = count
-          setNewWhatsApp(count)
-        })
-        .catch(() => {})
-    read()
-    const timer = setInterval(read, POLL_MS)
-    return () => clearInterval(timer)
-  }, [])
-
   /* عدّاد الشكاوي — للأدمن بس، وبوتيرة أهدى من الأوردرات
      (الشكوى مش حاجة بتتحل في ثواني زي الأوردر) */
   useEffect(() => {
@@ -205,12 +175,10 @@ export default function Board({ user, onLogout }) {
       byTab[t.id] =
         t.id === 'history'
           ? null
-          : t.id === 'whatsapp'
-            ? newWhatsApp
-            : orders.filter((order) => t.statuses.includes(order.status)).length
+          : orders.filter((order) => t.statuses.includes(order.status)).length
     }
     return byTab
-  }, [orders, newWhatsApp])
+  }, [orders])
 
   const shown = useMemo(() => {
     const active = TABS.find((t) => t.id === tab)
@@ -257,10 +225,7 @@ export default function Board({ user, onLogout }) {
               key={t.id}
               type="button"
               className={`tab ${tab === t.id ? 'is-on' : ''} ${
-                (t.id === 'new' && counts.new > 0) ||
-                (t.id === 'whatsapp' && newWhatsApp > 0)
-                  ? 'tab--alert'
-                  : ''
+                t.id === 'new' && counts.new > 0 ? 'tab--alert' : ''
               }`}
               onClick={() => setTab(t.id)}
             >
@@ -342,8 +307,6 @@ export default function Board({ user, onLogout }) {
         <AdminPrices onFlash={setFlash} />
       ) : view === 'complaints' ? (
         <AdminComplaints onFlash={setFlash} />
-      ) : tab === 'whatsapp' ? (
-        <WhatsAppRequests onFlash={setFlash} onCountChange={setNewWhatsApp} />
       ) : (
       <main className="grid">
         {shown.length === 0 ? (
