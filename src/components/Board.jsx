@@ -5,9 +5,12 @@ import {
   fetchHistoryOrders,
   fetchStatusMeta,
   fetchComplaintCounts,
+  fetchWhatsAppCount,
   updateOrderStatus,
 } from '../api'
+import useWakeLock from '../useWakeLock'
 import AdminComplaints from './AdminComplaints'
+import WhatsAppRequests from './WhatsAppRequests'
 import AdminPrices from './AdminPrices'
 import OrderCard from './OrderCard'
 import logo from '../logo-emblem.png'
@@ -20,6 +23,7 @@ const TABS = [
   { id: 'new', label: 'جديد', statuses: ['PENDING'] },
   { id: 'working', label: 'قيد التنفيذ', statuses: ['ACCEPTED', 'PREPARING'] },
   { id: 'ready', label: 'جاهز', statuses: ['READY'] },
+  { id: 'whatsapp', label: '💬 واتساب', statuses: [] },
   { id: 'history', label: 'السجل', statuses: ['COMPLETED', 'CANCELLED'] },
 ]
 
@@ -55,11 +59,18 @@ export default function Board({ user, onLogout }) {
   const [flash, setFlash] = useState(null) // رسالة قصيرة بعد أي عملية
 
   const [soundOn, setSoundOn] = useState(() => localStorage.getItem('tablet.sound') !== 'off')
+  /* منع الشاشة من النوم — مفتوح افتراضيًا، والموظف يقدر يقفله لو حب */
+  const [keepAwake, setKeepAwake] = useState(
+    () => localStorage.getItem('tablet.awake') !== 'off'
+  )
+  const wakeLock = useWakeLock(keepAwake)
   /* 'orders' = الأوردرات | 'prices' = الأسعار | 'complaints' = الشكاوي
      التنتين الأخيرين للأدمن بس */
   const [view, setView] = useState('orders')
   /* عدد الشكاوي الجديدة — بيظهر كشارة على زرار الشكاوي */
   const [newComplaints, setNewComplaints] = useState(0)
+  /* عدد طلبات الواتساب الجديدة — بيظهر كشارة على التبويب */
+  const [newWhatsApp, setNewWhatsApp] = useState(0)
 
   /* بنفتكر الأوردرات اللي شفناها — عشان نعرف الجديد ونضرب النغمة */
   const seenIds = useRef(null)
@@ -117,6 +128,31 @@ export default function Board({ user, onLogout }) {
     if (tab === 'history') loadHistory()
   }, [tab, loadHistory])
 
+  /* عدّاد طلبات الواتساب — بيشتغل مهما كان الموظف واقف على أنهي تبويب.
+     من غير ده الشارة مبتظهرش غير لما يفتح التبويب — واللي بيفوّت أوردر.
+     وبنضرب النغمة زي الأوردر الجديد بالظبط، لأن ده أوردر برضه. */
+  const seenWhatsApp = useRef(null)
+  useEffect(() => {
+    const read = () =>
+      fetchWhatsAppCount()
+        .then((result) => {
+          const count = result.newCount ?? 0
+          if (
+            seenWhatsApp.current !== null &&
+            count > seenWhatsApp.current &&
+            localStorage.getItem('tablet.sound') !== 'off'
+          ) {
+            beep()
+          }
+          seenWhatsApp.current = count
+          setNewWhatsApp(count)
+        })
+        .catch(() => {})
+    read()
+    const timer = setInterval(read, POLL_MS)
+    return () => clearInterval(timer)
+  }, [])
+
   /* عدّاد الشكاوي — للأدمن بس، وبوتيرة أهدى من الأوردرات
      (الشكوى مش حاجة بتتحل في ثواني زي الأوردر) */
   useEffect(() => {
@@ -169,16 +205,24 @@ export default function Board({ user, onLogout }) {
       byTab[t.id] =
         t.id === 'history'
           ? null
-          : orders.filter((order) => t.statuses.includes(order.status)).length
+          : t.id === 'whatsapp'
+            ? newWhatsApp
+            : orders.filter((order) => t.statuses.includes(order.status)).length
     }
     return byTab
-  }, [orders])
+  }, [orders, newWhatsApp])
 
   const shown = useMemo(() => {
     const active = TABS.find((t) => t.id === tab)
     if (tab === 'history') return history
     return orders.filter((order) => active.statuses.includes(order.status))
   }, [tab, orders, history])
+
+  const toggleAwake = () => {
+    const next = !keepAwake
+    setKeepAwake(next)
+    localStorage.setItem('tablet.awake', next ? 'on' : 'off')
+  }
 
   const toggleSound = () => {
     const next = !soundOn
@@ -213,7 +257,10 @@ export default function Board({ user, onLogout }) {
               key={t.id}
               type="button"
               className={`tab ${tab === t.id ? 'is-on' : ''} ${
-                t.id === 'new' && counts.new > 0 ? 'tab--alert' : ''
+                (t.id === 'new' && counts.new > 0) ||
+                (t.id === 'whatsapp' && newWhatsApp > 0)
+                  ? 'tab--alert'
+                  : ''
               }`}
               onClick={() => setTab(t.id)}
             >
@@ -259,6 +306,24 @@ export default function Board({ user, onLogout }) {
           >
             {soundOn ? '🔔' : '🔕'}
           </button>
+
+          {/* الشاشة متفضلش نايمة — بيختفي لو المتصفح مش داعمها */}
+          {wakeLock.supported ? (
+            <button
+              type="button"
+              className={`tool ${keepAwake ? 'is-on' : ''}`}
+              onClick={toggleAwake}
+              title={
+                keepAwake
+                  ? wakeLock.active
+                    ? 'الشاشة مش هتنام'
+                    : 'مفعّل — بيرجع يشتغل أول ما الشاشة تبان'
+                  : 'الشاشة هتنام عادي'
+              }
+            >
+              {keepAwake ? '☀️' : '🌙'}
+            </button>
+          ) : null}
           <button type="button" className="tool tool--exit" onClick={handleLogout} title="خروج">
             خروج
           </button>
@@ -277,6 +342,8 @@ export default function Board({ user, onLogout }) {
         <AdminPrices onFlash={setFlash} />
       ) : view === 'complaints' ? (
         <AdminComplaints onFlash={setFlash} />
+      ) : tab === 'whatsapp' ? (
+        <WhatsAppRequests onFlash={setFlash} onCountChange={setNewWhatsApp} />
       ) : (
       <main className="grid">
         {shown.length === 0 ? (

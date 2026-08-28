@@ -1199,3 +1199,138 @@ a {
   font-size: 0.85rem;
   color: var(--muted-text);
 }
+
+/* ==========================================================================
+   طلبات الواتساب
+   ========================================================================== */
+
+.war {
+  padding: 1.1rem;
+  max-width: 900px;
+  margin-inline: auto;
+}
+
+.war__head {
+  display: grid;
+  gap: 0.4rem;
+  margin-bottom: 1.1rem;
+}
+
+.war__title {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.war__hint {
+  font-size: 0.9rem;
+  color: var(--muted-text);
+  line-height: 1.6;
+}
+
+.war__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.9rem;
+  color: var(--text-soft);
+  justify-self: start;
+  min-height: 40px;
+  cursor: pointer;
+}
+
+.war__toggle input {
+  width: 18px;
+  height: 18px;
+}
+
+.wlist {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.wcard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-inline-start: 5px solid var(--wa);
+  border-radius: var(--radius-lg);
+  padding: 0.9rem 1.1rem;
+  display: grid;
+  gap: 0.6rem;
+  box-shadow: var(--shadow);
+}
+
+.wcard--done {
+  opacity: 0.6;
+  border-inline-start-color: var(--c-done);
+}
+
+.wcard__head {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 0.85rem;
+  color: var(--muted-text);
+}
+
+.wcard__num {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--gold);
+}
+
+.wcard__state {
+  margin-inline-start: auto;
+  font-weight: 600;
+  color: var(--c-done);
+}
+
+/* الطلب نفسه — أوضح حاجة في الكارت */
+.wcard__text {
+  font-size: 1.15rem;
+  line-height: 1.75;
+  font-weight: 600;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding: 0.7rem 0.9rem;
+  background: var(--surface-2);
+  border-radius: var(--radius);
+}
+
+.wcard__who {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.1rem;
+  align-items: center;
+}
+
+.wcard__name {
+  font-weight: 700;
+}
+
+.wcard__phone {
+  color: var(--muted-text);
+}
+
+.wcard__address {
+  line-height: 1.7;
+  color: var(--text-soft);
+  overflow-wrap: anywhere;
+}
+
+.wcard__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.15rem;
+}
+
+.btn--call {
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+}
+
+.btn--wa {
+  background: var(--wa);
+  color: #fff;
+}

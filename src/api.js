@@ -154,4 +154,17 @@ export const fetchComplaint = (id) => request(`/api/complaints/${id}`)
 export const updateComplaint = (id, patch) =>
   request(`/api/complaints/${id}`, { method: 'PATCH', body: patch })
 
+/* ----------------------- طلبات الواتساب (للموظف) ----------------------- */
+
+/** عدّاد الجديد بس — طلب خفيف بنعمله دوري عشان الشارة تبان من أي تبويب */
+export const fetchWhatsAppCount = () => request('/api/whatsapp/requests?limit=1')
+
+/** الطلبات الجاية من شات الواتساب — بكلام الزبون من غير أسعار */
+export const fetchWhatsAppRequests = (status) =>
+  request(`/api/whatsapp/requests?limit=50${status ? `&status=${status}` : ''}`)
+
+/** تعليم الطلب إنه اتسجّل أو اتلغى — ذرّي، أول واحد بس هو اللي بياخده */
+export const updateWhatsAppRequest = (id, status) =>
+  request(`/api/whatsapp/requests/${id}`, { method: 'PATCH', body: { status } })
+
 export const API_BASE_URL = BASE_URL
