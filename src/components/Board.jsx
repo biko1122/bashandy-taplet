@@ -16,6 +16,33 @@ import logo from '../logo-emblem.png'
 
 const POLL_MS = 8000
 
+/**
+ * السؤال بيوقف لما الشاشة تكون مخفية أو المحل قافل.
+ *
+ * ليه؟ لأن كل سؤال بيصحّي قاعدة البيانات، والقاعدة بتتحاسب بالساعة
+ * اللي بتفضل صاحية فيها. التابلت اللي بيسأل كل ٨ ثواني ٢٤ ساعة
+ * بيخلّيها صاحية الشهر كله — وده بيخلّص الحصة في نص الشهر ويوقف
+ * كل حاجة.
+ *
+ * الأوردرات مبتيجيش وإحنا قافلين، فمفيش حاجة بنفوّتها.
+ */
+const shouldPoll = () => {
+  if (typeof document !== 'undefined' && document.hidden) return false
+  try {
+    const hour = Number(
+      new Intl.DateTimeFormat('en-US', {
+        timeZone: 'Africa/Cairo',
+        hour: '2-digit',
+        hour12: false,
+      }).format(new Date())
+    ) % 24
+    /* مقفولين من ١ لـ ٦ — بنسأل كل شوية بس عشان لو حد فتح بدري */
+    return !(hour >= 1 && hour < 6)
+  } catch {
+    return true
+  }
+}
+
 /* التبويبات — "الكل" و"جديد" و"في الشغل" و"جاهز" والسجل */
 const TABS = [
   { id: 'all', label: 'الكل النشط', statuses: ['PENDING', 'ACCEPTED', 'PREPARING', 'READY'] },
@@ -113,13 +140,17 @@ export default function Board({ user, onLogout }) {
       .catch(() => {})
     loadActive()
 
-    const timer = setInterval(loadActive, POLL_MS)
+    const timer = setInterval(() => shouldPoll() && loadActive(), POLL_MS)
     /* أول ما التابلت يرجع للتطبيق نحدّث فورًا بدل انتظار الدورة */
     const onFocus = () => loadActive()
     window.addEventListener('focus', onFocus)
+    /* رجع للتابلت بعد ما كان مخفي؟ نحدّث على طول مننتظرش الدورة */
+    const onVisible = () => document.visibilityState === 'visible' && loadActive()
+    document.addEventListener('visibilitychange', onVisible)
     return () => {
       clearInterval(timer)
       window.removeEventListener('focus', onFocus)
+      document.removeEventListener('visibilitychange', onVisible)
     }
   }, [loadActive])
 
@@ -133,7 +164,7 @@ export default function Board({ user, onLogout }) {
         .then((r) => setBotHealth(r.data))
         .catch(() => {})
     read()
-    const timer = setInterval(read, 120000)
+    const timer = setInterval(() => shouldPoll() && read(), 120000)
     return () => clearInterval(timer)
   }, [])
 
@@ -146,7 +177,7 @@ export default function Board({ user, onLogout }) {
         .then((result) => setNewComplaints(result.newCount ?? 0))
         .catch(() => {})
     read()
-    const timer = setInterval(read, POLL_MS * 5)
+    const timer = setInterval(() => shouldPoll() && read(), POLL_MS * 5)
     return () => clearInterval(timer)
   }, [user, view])
 
