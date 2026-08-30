@@ -60,6 +60,14 @@ export default function OrderCard({ order, labels, transitions, onStatus, busyId
 
   return (
     <article className={`ocard ocard--${order.status.toLowerCase()}`}>
+      {/* الزبون طلب الإلغاء من الواتساب — بيبان قبل أي حاجة تانية
+          عشان الموظف مايجهّزش أوردر الزبون مبقاش عايزه */}
+      {order.cancelRequestedAt ? (
+        <div className="ocard__cancelreq">
+          ⚠️ الزبون طالب <b>إلغاء الأوردر</b> — كلّمه قبل ما تكمّل
+        </div>
+      ) : null}
+
       {/* ---------------- الهيدر: الرقم والوقت والحالة ---------------- */}
       <header className="ocard__head">
         <span className="ocard__number">#{order.orderNumber}</span>

@@ -1334,3 +1334,16 @@ a {
   background: var(--wa);
   color: #fff;
 }
+
+/* تنبيه: الزبون طلب إلغاء الأوردر من الواتساب */
+.ocard__cancelreq {
+  margin-bottom: 0.7rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radius);
+  background: var(--c-cancel-bg);
+  color: var(--c-cancel);
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: 1px solid var(--c-cancel);
+  animation: tab-pulse 1.8s ease-in-out infinite;
+}
