@@ -1347,3 +1347,31 @@ a {
   border: 1px solid var(--c-cancel);
   animation: tab-pulse 1.8s ease-in-out infinite;
 }
+
+/* تنبيه حالة بوت الواتساب */
+.alert--bot {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  font-weight: 700;
+}
+
+.alert--bot-down {
+  background: var(--c-cancel-bg);
+  color: var(--c-cancel);
+  border: 1px solid var(--c-cancel);
+  animation: tab-pulse 1.8s ease-in-out infinite;
+}
+
+.alert--bot-warning {
+  background: var(--c-pending-bg);
+  color: var(--c-pending);
+  border: 1px solid var(--c-pending);
+}
+
+.alert__hint {
+  font-weight: 400;
+  opacity: 0.85;
+  font-size: 0.9em;
+}

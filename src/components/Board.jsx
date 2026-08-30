@@ -5,6 +5,7 @@ import {
   fetchHistoryOrders,
   fetchStatusMeta,
   fetchComplaintCounts,
+  fetchWhatsAppHealth,
   updateOrderStatus,
 } from '../api'
 import useWakeLock from '../useWakeLock'
@@ -52,6 +53,9 @@ export default function Board({ user, onLogout }) {
   const [meta, setMeta] = useState(null) // labels + transitions من السيرفر
   const [tab, setTab] = useState('all')
   const [connected, setConnected] = useState(true)
+  /* حالة بوت الواتساب — لو التوكن خلص البوت بيسكت من غير علامة،
+     فالتابلت هو اللي بيقول للناس. بنسأل كل دقيقتين. */
+  const [botHealth, setBotHealth] = useState(null)
   const [busyId, setBusyId] = useState(null)
   const [flash, setFlash] = useState(null) // رسالة قصيرة بعد أي عملية
 
@@ -122,6 +126,16 @@ export default function Board({ user, onLogout }) {
   useEffect(() => {
     if (tab === 'history') loadHistory()
   }, [tab, loadHistory])
+
+  useEffect(() => {
+    const read = () =>
+      fetchWhatsAppHealth()
+        .then((r) => setBotHealth(r.data))
+        .catch(() => {})
+    read()
+    const timer = setInterval(read, 120000)
+    return () => clearInterval(timer)
+  }, [])
 
   /* عدّاد الشكاوي — للأدمن بس، وبوتيرة أهدى من الأوردرات
      (الشكوى مش حاجة بتتحل في ثواني زي الأوردر) */
@@ -298,6 +312,14 @@ export default function Board({ user, onLogout }) {
       {/* -------------------------- تنبيهات الحالة -------------------------- */}
       {!connected ? (
         <div className="alert alert--offline">⚠️ مش قادر أوصل للسيرفر — بحاول تاني…</div>
+      ) : null}
+
+      {/* بوت الواتساب واقف أو قرب يقف — الموظف لازم يشوفها */}
+      {botHealth && botHealth.status !== 'ok' && botHealth.status !== 'off' ? (
+        <div className={`alert alert--bot alert--bot-${botHealth.status}`}>
+          {botHealth.status === 'down' ? '🔴' : '🟡'} {botHealth.message}
+          {botHealth.action ? <span className="alert__hint">{botHealth.action}</span> : null}
+        </div>
       ) : null}
 
       {flash ? <div className={`alert alert--${flash.kind}`}>{flash.text}</div> : null}

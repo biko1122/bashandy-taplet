@@ -154,4 +154,7 @@ export const fetchComplaint = (id) => request(`/api/complaints/${id}`)
 export const updateComplaint = (id, patch) =>
   request(`/api/complaints/${id}`, { method: 'PATCH', body: patch })
 
+/** حالة بوت الواتساب — التابلت بيوري تنبيه لو واقف أو قرب يقف */
+export const fetchWhatsAppHealth = () => request('/api/whatsapp/health')
+
 export const API_BASE_URL = BASE_URL
