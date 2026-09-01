@@ -296,6 +296,11 @@ a {
 .topbar__tools {
   display: flex;
   gap: 0.4rem;
+  /* بقى فيه أزرار أكتر بعد ما ضفنا المحادثات — من غير اللف ده
+     الأزرار بتخرج بره الشاشة على تابلت ١٢٨٠ ومحدش يقدر يوصلها */
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-inline-start: auto;
 }
 
 .tool {
@@ -1374,4 +1379,215 @@ a {
   font-weight: 400;
   opacity: 0.85;
   font-size: 0.9em;
+}
+
+/* ==========================================================================
+   صندوق الوارد — محادثات الواتساب
+   --------------------------------------------------------------------------
+   الشكل مقصود إنه زي الواتساب: القايمة على جنب والكلام في النص. الموظف
+   عارف الشكل ده أصلًا، فمش هيتعلم حاجة جديدة وهو واقف قدام الزبون.
+   ========================================================================== */
+
+.inbox {
+  display: grid;
+  grid-template-columns: minmax(240px, 320px) 1fr;
+  gap: 14px;
+  padding: 14px;
+  height: calc(100vh - 92px);
+  min-height: 0;
+}
+
+.inbox__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  padding-inline-end: 4px;
+}
+
+.inbox__empty {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--muted-text);
+  padding: 32px 16px;
+  margin: auto;
+}
+.inbox__empty small { opacity: 0.75; }
+
+/* ------------------------------ سطر المحادثة ------------------------------ */
+
+.convo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: start;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+}
+.convo:hover { border-color: var(--border-strong); }
+.convo.is-on { border-color: var(--accent); background: var(--surface-2); }
+
+/* المستنية بتلفت النظر — دي اللي محدش ماسكها والزبون مستني */
+.convo--waiting { border-inline-start: 4px solid var(--gold); }
+
+.convo__top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.convo__unread {
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--gold);
+  color: var(--brand);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: center;
+}
+.convo__reason { font-size: 0.8rem; color: var(--gold); }
+.convo__preview {
+  font-size: 0.85rem;
+  color: var(--text-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.convo__time { font-size: 0.72rem; color: var(--muted-text); }
+
+/* -------------------------------- المحادثة -------------------------------- */
+
+.inbox__thread {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.thread__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.thread__head small { display: block; color: var(--muted-text); font-size: 0.8rem; }
+.thread__actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* عدّاد الـ ٢٤ ساعة — أهم رقم في الشاشة */
+.thread__window {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  font-size: 0.82rem;
+  color: var(--text-soft);
+  white-space: nowrap;
+}
+.thread__window.is-danger {
+  border-color: var(--gold);
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.thread__note {
+  margin: 0;
+  padding: 7px 14px;
+  font-size: 0.82rem;
+  color: var(--muted-text);
+  background: var(--surface-2);
+}
+.thread__note--warn { color: var(--gold); }
+
+.thread__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+}
+
+.bubble {
+  max-width: min(78%, 560px);
+  padding: 8px 12px;
+  border-radius: 14px;
+  line-height: 1.55;
+}
+.bubble p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.bubble__media { font-style: italic; color: var(--text-soft); }
+.bubble__meta { display: block; margin-top: 3px; font-size: 0.68rem; color: var(--muted-text); }
+
+/* الجاي من الزبون على الشمال، والرايح مننا على اليمين */
+.bubble--in {
+  align-self: flex-start;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-start-start-radius: 4px;
+}
+.bubble--out {
+  align-self: flex-end;
+  background: var(--gold);
+  /* نص غامق على الذهبي: تباين ٦:١ بدل ٣:١ للنص الفاتح. الموظف
+     بيقرا ده وهو واقف قدام الزبون — الوضوح مش رفاهية. */
+  color: var(--brand);
+  border-start-end-radius: 4px;
+}
+.bubble--out .bubble__meta { color: rgba(23, 18, 12, 0.72); }
+
+.thread__error {
+  margin: 0;
+  padding: 8px 14px;
+  background: var(--c-pending-bg);
+  color: var(--gold);
+  font-size: 0.85rem;
+}
+
+/* --------------------------------- الرد --------------------------------- */
+
+.thread__reply {
+  display: flex;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+}
+.thread__reply textarea {
+  flex: 1;
+  resize: none;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  line-height: 1.5;
+}
+.thread__reply textarea:disabled { opacity: 0.55; }
+.thread__reply button {
+  padding: 0 22px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--gold);
+  color: var(--brand);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.thread__reply button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* على تابلت واقف، القايمة فوق والمحادثة تحت */
+@media (max-width: 820px) {
+  .inbox { grid-template-columns: 1fr; height: auto; }
+  .inbox__list { max-height: 34vh; }
+  .inbox__thread { min-height: 60vh; }
 }

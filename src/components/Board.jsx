@@ -6,10 +6,12 @@ import {
   fetchStatusMeta,
   fetchComplaintCounts,
   fetchWhatsAppHealth,
+  fetchConversations,
   updateOrderStatus,
 } from '../api'
 import useWakeLock from '../useWakeLock'
 import AdminComplaints from './AdminComplaints'
+import Inbox from './Inbox'
 import AdminPrices from './AdminPrices'
 import OrderCard from './OrderCard'
 import logo from '../logo-emblem.png'
@@ -97,6 +99,8 @@ export default function Board({ user, onLogout }) {
   const [view, setView] = useState('orders')
   /* عدد الشكاوي الجديدة — بيظهر كشارة على زرار الشكاوي */
   const [newComplaints, setNewComplaints] = useState(0)
+  /* محادثات واتساب مستنية موظف — البوت رفع إيده فيها */
+  const [waitingChats, setWaitingChats] = useState(0)
 
   /* بنفتكر الأوردرات اللي شفناها — عشان نعرف الجديد ونضرب النغمة */
   const seenIds = useRef(null)
@@ -170,6 +174,18 @@ export default function Board({ user, onLogout }) {
 
   /* عدّاد الشكاوي — للأدمن بس، وبوتيرة أهدى من الأوردرات
      (الشكوى مش حاجة بتتحل في ثواني زي الأوردر) */
+  /* المحادثات المستنية: ده شغل أي موظف على التابلت مش الأدمن بس —
+     الزبون اللي مستني رد مبيفرقش معاه مين اللي هيرد عليه. */
+  useEffect(() => {
+    const read = () =>
+      fetchConversations()
+        .then((result) => setWaitingChats(result.data?.waiting ?? 0))
+        .catch(() => {})
+    read()
+    const timer = setInterval(() => shouldPoll() && read(), POLL_MS)
+    return () => clearInterval(timer)
+  }, [])
+
   useEffect(() => {
     if (user?.role !== 'ADMIN') return
     const read = () =>
@@ -285,6 +301,20 @@ export default function Board({ user, onLogout }) {
 
         <div className="topbar__tools">
           {/* الأسعار والشكاوي — للأدمن الأساسي بس */}
+          {/* المحادثات — متاحة لأي موظف */}
+          <button
+            type="button"
+            className={`tool tool--wide ${view === 'inbox' ? 'is-on' : ''} ${
+              waitingChats > 0 ? 'tool--alert' : ''
+            }`}
+            onClick={() => setView(view === 'inbox' ? 'orders' : 'inbox')}
+          >
+            {view === 'inbox' ? '📋 الأوردرات' : '💬 المحادثات'}
+            {waitingChats > 0 && view !== 'inbox' ? (
+              <span className="tool__count">{waitingChats}</span>
+            ) : null}
+          </button>
+
           {user?.role === 'ADMIN' ? (
             <>
               <button
@@ -360,6 +390,8 @@ export default function Board({ user, onLogout }) {
         <AdminPrices onFlash={setFlash} />
       ) : view === 'complaints' ? (
         <AdminComplaints onFlash={setFlash} />
+      ) : view === 'inbox' ? (
+        <Inbox onCountChange={setWaitingChats} />
       ) : (
       <main className="grid">
         {shown.length === 0 ? (

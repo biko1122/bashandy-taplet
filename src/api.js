@@ -157,4 +157,20 @@ export const updateComplaint = (id, patch) =>
 /** حالة بوت الواتساب — التابلت بيوري تنبيه لو واقف أو قرب يقف */
 export const fetchWhatsAppHealth = () => request('/api/whatsapp/health')
 
+/* ------------------------------ صندوق الوارد ------------------------------ */
+/* المحادثات اللي البوت رفع فيها إيده ومحتاجة موظف يرد */
+
+export const fetchConversations = () => request('/api/inbox')
+
+export const fetchConversation = (phone) => request(`/api/inbox/${phone}`)
+
+export const claimConversation = (phone) =>
+  request(`/api/inbox/${phone}/claim`, { method: 'POST' })
+
+export const releaseConversation = (phone) =>
+  request(`/api/inbox/${phone}/release`, { method: 'POST' })
+
+export const replyToConversation = (phone, message) =>
+  request(`/api/inbox/${phone}/reply`, { method: 'POST', body: { message } })
+
 export const API_BASE_URL = BASE_URL
