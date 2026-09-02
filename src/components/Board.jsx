@@ -179,7 +179,16 @@ export default function Board({ user, onLogout }) {
   useEffect(() => {
     const read = () =>
       fetchConversations()
-        .then((result) => setWaitingChats(result.data?.waiting ?? 0))
+        .then((result) => {
+          const now = result.data?.waiting ?? 0
+          /* نغمة لما محادثة جديدة تستنى — من غيرها العدّاد بيزيد في
+             صمت، والموظف الواقف على تاب الأوردرات عمره ما هيلاحظ إن
+             فيه زبون طالب حد يكلّمه. نفس منطق الأوردر الجديد. */
+          setWaitingChats((was) => {
+            if (now > was && localStorage.getItem('tablet.sound') !== 'off') beep()
+            return now
+          })
+        })
         .catch(() => {})
     read()
     const timer = setInterval(() => shouldPoll() && read(), POLL_MS)
