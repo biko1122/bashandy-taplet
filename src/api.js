@@ -122,8 +122,18 @@ export const fetchActiveOrders = () =>
 export const fetchHistoryOrders = () =>
   request('/api/orders?status=COMPLETED,CANCELLED&limit=40')
 
-export const updateOrderStatus = (orderId, status, note) =>
-  request(`/api/orders/${orderId}/status`, { method: 'PATCH', body: { status, note } })
+export const updateOrderStatus = (orderId, status, extra = {}) =>
+  request(`/api/orders/${orderId}/status`, { method: 'PATCH', body: { status, ...extra } })
+
+/* ------------------------------ مناديب التوصيل ------------------------------ */
+
+export const fetchRiders = (all = false) => request(`/api/delivery${all ? '?all=true' : ''}`)
+
+export const addRider = (name, phone) =>
+  request('/api/delivery', { method: 'POST', body: { name, phone } })
+
+export const updateRider = (id, patch) =>
+  request(`/api/delivery/${id}`, { method: 'PATCH', body: patch })
 
 /* ------------------------ لوحة الأسعار (أدمن بس) ------------------------ */
 

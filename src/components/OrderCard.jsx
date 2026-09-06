@@ -38,9 +38,11 @@ const timeInfo = (createdAt) => {
  * كارت الأوردر — كل حاجة الموظف محتاج يشوفها من غير ما يفتح أي حاجة تانية:
  * العميل كامل (اسم/رقم/عنوان)، الأصناف باختياراتها، الملاحظة، والإجمالي.
  */
-export default function OrderCard({ order, labels, transitions, onStatus, busyId }) {
+export default function OrderCard({ order, labels, transitions, onStatus, busyId, riders = [] }) {
   /* الإلغاء على خطوتين عشان مفيش إلغاء بالغلط بصباع على الشاشة */
   const [confirmCancel, setConfirmCancel] = useState(false)
+  /* اختيار المندوب — بيفتح لما يدوس "خرج من المطعم" على أوردر توصيل */
+  const [pickingRider, setPickingRider] = useState(false)
 
   const busy = busyId === order.id
   const allowed = transitions?.[order.status] ?? []
@@ -55,7 +57,19 @@ export default function OrderCard({ order, labels, transitions, onStatus, busyId
       return
     }
     setConfirmCancel(false)
+
+    /* أوردر توصيل بيخرج → لازم مندوب. السيرفر بيرفض من غيره أصلًا،
+       بس بنسأل هنا عشان الموظف ميدوسش ويلاقي رسالة خطأ. */
+    if (status === 'COMPLETED' && isDelivery) {
+      setPickingRider(true)
+      return
+    }
     onStatus(order, status)
+  }
+
+  const sendWithRider = (rider) => {
+    setPickingRider(false)
+    onStatus(order, 'COMPLETED', { deliveryPersonId: rider.id })
   }
 
   return (
@@ -107,6 +121,14 @@ export default function OrderCard({ order, labels, transitions, onStatus, busyId
         )}
       </div>
 
+      {/* المندوب اللي خرج بالأوردر — بيبان في السجل */}
+      {order.deliveryPersonName ? (
+        <p className="ocard__rider">
+          🛵 خرج مع <b>{order.deliveryPersonName}</b>
+          {order.deliveryPersonPhone ? ` · ${displayPhone(order.deliveryPersonPhone)}` : ''}
+        </p>
+      ) : null}
+
       {/* ---------------- ملاحظة العميل — لازم تبان جامد ---------------- */}
       {order.note ? <p className="ocard__note">📝 {order.note}</p> : null}
 
@@ -136,6 +158,39 @@ export default function OrderCard({ order, labels, transitions, onStatus, busyId
           <small>غير شامل التوصيل — اتفق مع العميل</small>
         ) : null}
       </div>
+
+      {/* ---------------- اختيار المندوب ---------------- */}
+      {pickingRider ? (
+        <div className="ocard__riders">
+          <p className="ocard__riders-title">🛵 مين هيخرج بالأوردر؟</p>
+          {riders.length === 0 ? (
+            <p className="ocard__riders-empty">
+              مفيش مناديب متسجّلين — ضيفهم من <b>🛵 المناديب</b> فوق.
+            </p>
+          ) : (
+            <div className="ocard__riders-list">
+              {riders.map((rider) => (
+                <button
+                  key={rider.id}
+                  type="button"
+                  className="btn btn--rider"
+                  disabled={busy}
+                  onClick={() => sendWithRider(rider)}
+                >
+                  {rider.name}
+                </button>
+              ))}
+            </div>
+          )}
+          <button
+            type="button"
+            className="ocard__riders-cancel"
+            onClick={() => setPickingRider(false)}
+          >
+            رجوع
+          </button>
+        </div>
+      ) : null}
 
       {/* ---------------- الأزرار ---------------- */}
       <div className="ocard__actions">

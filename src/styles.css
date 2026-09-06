@@ -1591,3 +1591,112 @@ a {
   .inbox__list { max-height: 34vh; }
   .inbox__thread { min-height: 60vh; }
 }
+
+/* ==========================================================================
+   مناديب التوصيل
+   ========================================================================== */
+
+/* ------------------------- اختيار المندوب في الكارت ------------------------- */
+
+.ocard__riders {
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  border: 1px solid var(--gold);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+.ocard__riders-title { margin: 0 0 8px; font-weight: 700; }
+.ocard__riders-empty { margin: 0; color: var(--muted-text); font-size: 0.88rem; }
+.ocard__riders-list { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.btn--rider {
+  padding: 9px 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn--rider:hover:not(:disabled) { background: var(--gold); color: #fffdf8; border-color: var(--gold); }
+.btn--rider:disabled { opacity: 0.5; }
+
+.ocard__riders-cancel {
+  margin-top: 8px;
+  border: 0;
+  background: none;
+  color: var(--muted-text);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* المندوب اللي خرج — بيبان في السجل */
+.ocard__rider {
+  margin: 6px 0 0;
+  padding: 5px 9px;
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  font-size: 0.88rem;
+}
+
+/* ------------------------------ شاشة الإدارة ------------------------------ */
+
+.riders { padding: 14px; display: grid; gap: 14px; max-width: 640px; margin-inline: auto; }
+
+.riders__form {
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+.riders__form h2 { margin: 0 0 10px; font-size: 1.05rem; }
+.riders__form small { display: block; margin-top: 8px; color: var(--muted-text); }
+.riders__fields { display: flex; gap: 8px; flex-wrap: wrap; }
+.riders__fields input {
+  flex: 1 1 160px;
+  padding: 9px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+}
+.riders__fields button {
+  padding: 9px 22px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--gold);
+  color: #fffdf8;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.riders__fields button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.riders__list h3 { margin: 14px 0 8px; font-size: 0.95rem; color: var(--muted-text); }
+.riders__empty { margin: 0; color: var(--c-cancel); }
+
+.rider {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.rider small { display: block; color: var(--muted-text); font-size: 0.82rem; }
+.rider--off { opacity: 0.6; }
+.rider__stop, .rider__start {
+  padding: 7px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}

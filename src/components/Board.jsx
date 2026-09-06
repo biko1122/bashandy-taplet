@@ -7,11 +7,13 @@ import {
   fetchComplaintCounts,
   fetchWhatsAppHealth,
   fetchConversations,
+  fetchRiders,
   updateOrderStatus,
 } from '../api'
 import useWakeLock from '../useWakeLock'
 import AdminComplaints from './AdminComplaints'
 import Inbox from './Inbox'
+import AdminRiders from './AdminRiders'
 import AdminPrices from './AdminPrices'
 import OrderCard from './OrderCard'
 import logo from '../logo-emblem.png'
@@ -101,6 +103,8 @@ export default function Board({ user, onLogout }) {
   const [newComplaints, setNewComplaints] = useState(0)
   /* محادثات واتساب مستنية موظف — البوت رفع إيده فيها */
   const [waitingChats, setWaitingChats] = useState(0)
+  /* المناديب الشغالين — بيتعرضوا وقت "خرج من المطعم" */
+  const [riders, setRiders] = useState([])
 
   /* بنفتكر الأوردرات اللي شفناها — عشان نعرف الجديد ونضرب النغمة */
   const seenIds = useRef(null)
@@ -174,6 +178,13 @@ export default function Board({ user, onLogout }) {
 
   /* عدّاد الشكاوي — للأدمن بس، وبوتيرة أهدى من الأوردرات
      (الشكوى مش حاجة بتتحل في ثواني زي الأوردر) */
+  /* المناديب — بيتحمّلوا مرة واحدة، وبيتحدّثوا لو الأدمن ضاف حد */
+  const loadRiders = useCallback(
+    () => fetchRiders().then((r) => setRiders(r.data ?? [])).catch(() => {}),
+    []
+  )
+  useEffect(() => { loadRiders() }, [loadRiders])
+
   /* المحادثات المستنية: ده شغل أي موظف على التابلت مش الأدمن بس —
      الزبون اللي مستني رد مبيفرقش معاه مين اللي هيرد عليه. */
   useEffect(() => {
@@ -209,11 +220,11 @@ export default function Board({ user, onLogout }) {
   /* ------------------------------ تغيير الحالة ------------------------------ */
 
   const handleStatus = useCallback(
-    async (order, status) => {
+    async (order, status, extra = {}) => {
       setBusyId(order.id)
 
       try {
-        const result = await updateOrderStatus(order.id, status)
+        const result = await updateOrderStatus(order.id, status, extra)
         const updated = result.data
 
         setOrders((current) =>
@@ -345,6 +356,13 @@ export default function Board({ user, onLogout }) {
               >
                 {view === 'prices' ? '📋 الأوردرات' : '💰 الأسعار'}
               </button>
+              <button
+                type="button"
+                className={`tool tool--wide ${view === 'riders' ? 'is-on' : ''}`}
+                onClick={() => setView(view === 'riders' ? 'orders' : 'riders')}
+              >
+                {view === 'riders' ? '📋 الأوردرات' : '🛵 المناديب'}
+              </button>
             </>
           ) : null}
           <button
@@ -401,6 +419,8 @@ export default function Board({ user, onLogout }) {
         <AdminComplaints onFlash={setFlash} />
       ) : view === 'inbox' ? (
         <Inbox onCountChange={setWaitingChats} />
+      ) : view === 'riders' ? (
+        <AdminRiders onFlash={setFlash} onChange={loadRiders} />
       ) : (
       <main className="grid">
         {shown.length === 0 ? (
@@ -416,6 +436,7 @@ export default function Board({ user, onLogout }) {
               transitions={meta?.transitions}
               onStatus={handleStatus}
               busyId={busyId}
+              riders={riders}
             />
           ))
         )}
