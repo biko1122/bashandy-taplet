@@ -1700,3 +1700,88 @@ a {
   font: inherit;
   cursor: pointer;
 }
+
+/* ========================================================================= */
+/*  السيرفر مش راد                                                            */
+/* ========================================================================= */
+/* فوق كل حاجة وبلون صريح: الموظف لازم يعرف إن اللوحة متجمّدة قبل ما
+   يفضل نص ساعة فاكر إن مفيش أوردرات. */
+.offline {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: #7f1d1d;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  text-align: center;
+  padding: 10px 14px;
+}
+
+/* ========================================================================= */
+/*  رقم التذكرة الجاي + التصفير                                              */
+/* ========================================================================= */
+.ticket {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 10px 14px 0;
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.ticket__label { color: var(--muted-text); font-size: 0.85rem; }
+.ticket__num {
+  font-size: 1.25rem;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+.ticket__when { color: var(--muted-text); font-size: 0.78rem; margin-inline-start: auto; }
+.ticket__reset,
+.ticket__go,
+.ticket__no {
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 9px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-2);
+  color: var(--text-soft);
+  cursor: pointer;
+}
+.ticket__go { background: #7f1d1d; border-color: #7f1d1d; color: #fff; }
+.ticket__reset:focus-visible,
+.ticket__go:focus-visible,
+.ticket__no:focus-visible { outline: 2.5px solid var(--gold); outline-offset: 2px; }
+
+/* ========================================================================= */
+/*  حاضر / غايب                                                              */
+/* ========================================================================= */
+.riders__here { color: var(--gold); font-weight: 700; }
+.rider__actions { display: flex; gap: 8px; align-items: center; }
+.rider--away { opacity: 0.62; }
+/* زرار كبير بالعمد — بيتداس بالإبهام على تابلت في مطبخ */
+.rider__here {
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  min-width: 86px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border-strong);
+  background: var(--surface-2);
+  color: var(--muted-text);
+  cursor: pointer;
+}
+.rider__here.is-on {
+  background: #065f46;
+  border-color: #065f46;
+  color: #fff;
+}
+.rider__here:focus-visible { outline: 2.5px solid var(--gold); outline-offset: 2px; }
+.btn--rider-away { opacity: 0.55; }
+.btn--rider-away small { font-weight: 400; }

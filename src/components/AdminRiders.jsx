@@ -11,7 +11,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react'
-import { fetchRiders, addRider, updateRider } from '../api'
+import { fetchRiders, addRider, updateRider, setRiderPresence } from '../api'
 
 const displayPhone = (phone) => {
   if (phone?.startsWith('20') && phone.length === 12) {
@@ -21,7 +21,8 @@ const displayPhone = (phone) => {
   return phone
 }
 
-export default function AdminRiders({ onFlash, onChange }) {
+export default function AdminRiders({ user, onFlash, onChange }) {
+  const canManage = user?.role === 'ADMIN'
   const [riders, setRiders] = useState([])
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
@@ -67,11 +68,28 @@ export default function AdminRiders({ onFlash, onChange }) {
     }
   }
 
+  /* حاضر / غايب — ده اللي بيتغيّر كل شيفت، فأي موظف يقدر يدوسه.
+     بنغيّر الشاشة على طول من غير ما نستنى السيرفر، عشان الدوسة
+     تبان فورًا؛ ولو فشلت بنرجّع الحالة ونقول السبب. */
+  const togglePresence = async (rider) => {
+    const next = !rider.isPresent
+    setRiders((list) => list.map((r) => (r.id === rider.id ? { ...r, isPresent: next } : r)))
+    try {
+      await setRiderPresence(rider.id, next)
+      onChange?.()
+    } catch (error) {
+      setRiders((list) => list.map((r) => (r.id === rider.id ? { ...r, isPresent: !next } : r)))
+      onFlash?.({ kind: 'err', text: error.message })
+    }
+  }
+
   const active = riders.filter((r) => r.isActive)
   const stopped = riders.filter((r) => !r.isActive)
+  const here = active.filter((r) => r.isPresent).length
 
   return (
     <div className="riders">
+      {canManage ? (
       <form className="riders__form" onSubmit={submit}>
         <h2>🛵 ضيف مندوب</h2>
         <div className="riders__fields">
@@ -94,23 +112,43 @@ export default function AdminRiders({ onFlash, onChange }) {
         </div>
         <small>الرقم ده بيوصل للزبون في رسالة الواتساب — خلي بالك يكون صح.</small>
       </form>
+      ) : null}
 
       <section className="riders__list">
-        <h3>شغالين ({active.length})</h3>
+        <h3>
+          شغالين ({active.length}) · <span className="riders__here">حاضر دلوقتي {here}</span>
+        </h3>
         {active.length === 0 ? (
           <p className="riders__empty">مفيش مناديب شغالين — الأوردرات مش هتقدر تخرج.</p>
         ) : (
-          active.map((rider) => (
-            <div className="rider" key={rider.id}>
-              <div>
-                <b>{rider.name}</b>
-                <small dir="ltr">{displayPhone(rider.phone)}</small>
+          <>
+            {here === 0 ? (
+              <p className="riders__empty">محدش معلّم حاضر — دوس «حاضر» على اللي في الشيفت.</p>
+            ) : null}
+            {active.map((rider) => (
+              <div className={`rider ${rider.isPresent ? '' : 'rider--away'}`} key={rider.id}>
+                <div>
+                  <b>{rider.name}</b>
+                  <small dir="ltr">{displayPhone(rider.phone)}</small>
+                </div>
+                <div className="rider__actions">
+                  <button
+                    type="button"
+                    className={`rider__here ${rider.isPresent ? 'is-on' : ''}`}
+                    aria-pressed={Boolean(rider.isPresent)}
+                    onClick={() => togglePresence(rider)}
+                  >
+                    {rider.isPresent ? '✓ حاضر' : 'غايب'}
+                  </button>
+                  {canManage ? (
+                    <button type="button" className="rider__stop" onClick={() => toggle(rider)}>
+                      إيقاف
+                    </button>
+                  ) : null}
+                </div>
               </div>
-              <button type="button" className="rider__stop" onClick={() => toggle(rider)}>
-                إيقاف
-              </button>
-            </div>
-          ))
+            ))}
+          </>
         )}
 
         {stopped.length ? (
@@ -122,9 +160,11 @@ export default function AdminRiders({ onFlash, onChange }) {
                   <b>{rider.name}</b>
                   <small dir="ltr">{displayPhone(rider.phone)}</small>
                 </div>
-                <button type="button" className="rider__start" onClick={() => toggle(rider)}>
-                  رجّعه
-                </button>
+                {canManage ? (
+                  <button type="button" className="rider__start" onClick={() => toggle(rider)}>
+                    رجّعه
+                  </button>
+                ) : null}
               </div>
             ))}
           </>

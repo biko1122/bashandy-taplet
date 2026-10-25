@@ -169,15 +169,19 @@ export default function OrderCard({ order, labels, transitions, onStatus, busyId
             </p>
           ) : (
             <div className="ocard__riders-list">
+              {/* الحاضرين فوق (السيرفر بيرتّبهم كده)، والغايب بيفضل
+                  ظاهر وباهت — لو جه فجأة الموظف ميدوّرش عليه في شاشة
+                  تانية. */}
               {riders.map((rider) => (
                 <button
                   key={rider.id}
                   type="button"
-                  className="btn btn--rider"
+                  className={`btn btn--rider ${rider.isPresent === false ? 'btn--rider-away' : ''}`}
                   disabled={busy}
                   onClick={() => sendWithRider(rider)}
                 >
                   {rider.name}
+                  {rider.isPresent === false ? <small> (غايب)</small> : null}
                 </button>
               ))}
             </div>

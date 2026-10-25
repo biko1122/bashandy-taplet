@@ -51,6 +51,21 @@ const emitAuthExpired = () => {
   window.dispatchEvent(new Event('tablet-auth-expired'))
 }
 
+/**
+ * وصلنا للسيرفر ولا لأ.
+ *
+ * ⚠️ ده مش تفصيلة شكلية: شاشة الأوردرات بتسأل السيرفر كل شوية، ولو
+ *    وقع كانت بتفضل عارضة آخر لقطة بهدوء — الموظف يفضل باصص على
+ *    لوحة مجمّدة وهو فاكرها فاضية، والأوردرات الجديدة بتضيع. الحدث
+ *    ده بيخلي التطبيق يقول له بصريح العبارة.
+ */
+let lastReachable = null
+const emitReachable = (ok) => {
+  if (ok === lastReachable) return
+  lastReachable = ok
+  window.dispatchEvent(new CustomEvent('tablet-server', { detail: { ok } }))
+}
+
 const request = async (path, { method = 'GET', body } = {}) => {
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), 15000)
@@ -73,12 +88,14 @@ const request = async (path, { method = 'GET', body } = {}) => {
     })
   } catch (error) {
     clearTimeout(timer)
+    emitReachable(false)
     if (error.name === 'AbortError') {
       throw new ApiError('السيرفر أخد وقت طويل', { code: 'TIMEOUT' })
     }
     throw new ApiError('مش قادر أوصل للسيرفر', { code: 'NETWORK' })
   }
   clearTimeout(timer)
+  emitReachable(true)
 
   let payload = null
   try {
@@ -131,6 +148,14 @@ export const fetchRiders = (all = false) => request(`/api/delivery${all ? '?all=
 
 export const addRider = (name, phone) =>
   request('/api/delivery', { method: 'POST', body: { name, phone } })
+
+/* حاضر / غايب — أي موظف يقدر يدوسه، مش الأدمن بس */
+export const setRiderPresence = (id, isPresent) =>
+  request(`/api/delivery/${id}/presence`, { method: 'PATCH', body: { isPresent } })
+
+/* عدّاد أرقام التذاكر */
+export const fetchCounter = () => request('/api/orders/meta/counter')
+export const resetCounter = () => request('/api/orders/counter/reset', { method: 'POST' })
 
 export const updateRider = (id, patch) =>
   request(`/api/delivery/${id}`, { method: 'PATCH', body: patch })

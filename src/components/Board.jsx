@@ -9,6 +9,8 @@ import {
   fetchConversations,
   fetchRiders,
   updateOrderStatus,
+  fetchCounter,
+  resetCounter,
 } from '../api'
 import useWakeLock from '../useWakeLock'
 import AdminComplaints from './AdminComplaints'
@@ -105,6 +107,8 @@ export default function Board({ user, onLogout }) {
   const [waitingChats, setWaitingChats] = useState(0)
   /* المناديب الشغالين — بيتعرضوا وقت "خرج من المطعم" */
   const [riders, setRiders] = useState([])
+  const [counter, setCounter] = useState(null)   // رقم التذكرة الجاي
+  const [resetting, setResetting] = useState(false)
 
   /* بنفتكر الأوردرات اللي شفناها — عشان نعرف الجديد ونضرب النغمة */
   const seenIds = useRef(null)
@@ -179,11 +183,31 @@ export default function Board({ user, onLogout }) {
   /* عدّاد الشكاوي — للأدمن بس، وبوتيرة أهدى من الأوردرات
      (الشكوى مش حاجة بتتحل في ثواني زي الأوردر) */
   /* المناديب — بيتحمّلوا مرة واحدة، وبيتحدّثوا لو الأدمن ضاف حد */
+  const loadCounter = useCallback(
+    () => fetchCounter().then((r) => setCounter(r.data)).catch(() => {}),
+    []
+  )
+
   const loadRiders = useCallback(
     () => fetchRiders().then((r) => setRiders(r.data ?? [])).catch(() => {}),
     []
   )
   useEffect(() => { loadRiders() }, [loadRiders])
+  useEffect(() => { loadCounter() }, [loadCounter])
+
+  /* تصفير أرقام التذاكر — خطوتين عشان متتداسش بالغلط وسط الزحمة */
+  const doReset = async () => {
+    if (!resetting) { setResetting(true); return }
+    try {
+      const r = await resetCounter()
+      setCounter(r.data)
+      setFlash({ kind: 'ok', text: `الأرقام اتصفّرت — الأوردر الجاي #${r.data.next}` })
+    } catch (error) {
+      setFlash({ kind: 'err', text: error.message })
+    } finally {
+      setResetting(false)
+    }
+  }
 
   /* المحادثات المستنية: ده شغل أي موظف على التابلت مش الأدمن بس —
      الزبون اللي مستني رد مبيفرقش معاه مين اللي هيرد عليه. */
@@ -356,15 +380,18 @@ export default function Board({ user, onLogout }) {
               >
                 {view === 'prices' ? '📋 الأوردرات' : '💰 الأسعار'}
               </button>
-              <button
-                type="button"
-                className={`tool tool--wide ${view === 'riders' ? 'is-on' : ''}`}
-                onClick={() => setView(view === 'riders' ? 'orders' : 'riders')}
-              >
-                {view === 'riders' ? '📋 الأوردرات' : '🛵 المناديب'}
-              </button>
             </>
           ) : null}
+
+          {/* المناديب متاحة لأي موظف: «حاضر/غايب» بيتغيّر كل شيفت.
+              الإضافة والإيقاف جوه الشاشة لسه للأدمن بس. */}
+          <button
+            type="button"
+            className={`tool tool--wide ${view === 'riders' ? 'is-on' : ''}`}
+            onClick={() => setView(view === 'riders' ? 'orders' : 'riders')}
+          >
+            {view === 'riders' ? '📋 الأوردرات' : '🛵 المناديب'}
+          </button>
           <button
             type="button"
             className={`tool ${soundOn ? 'is-on' : ''}`}
@@ -420,8 +447,34 @@ export default function Board({ user, onLogout }) {
       ) : view === 'inbox' ? (
         <Inbox onCountChange={setWaitingChats} />
       ) : view === 'riders' ? (
-        <AdminRiders onFlash={setFlash} onChange={loadRiders} />
+        <AdminRiders user={user} onFlash={setFlash} onChange={loadRiders} />
       ) : (
+      <>
+      <div className="ticket">
+        <span className="ticket__label">الأوردر الجاي</span>
+        <b className="ticket__num">#{counter?.next ?? '—'}</b>
+        {resetting ? (
+          <>
+            <button type="button" className="ticket__go" onClick={doReset}>
+              أكيد؟ صفّر
+            </button>
+            <button type="button" className="ticket__no" onClick={() => setResetting(false)}>
+              لأ
+            </button>
+          </>
+        ) : (
+          <button type="button" className="ticket__reset" onClick={doReset}>
+            صفّر الأرقام
+          </button>
+        )}
+        {counter?.resetAt ? (
+          <small className="ticket__when">
+            آخر تصفير: {new Date(counter.resetAt).toLocaleString('ar-EG', { dateStyle: 'short', timeStyle: 'short' })}
+            {counter.resetBy ? ` · ${counter.resetBy}` : ''}
+          </small>
+        ) : null}
+      </div>
+
       <main className="grid">
         {shown.length === 0 ? (
           <div className="empty">
@@ -441,6 +494,7 @@ export default function Board({ user, onLogout }) {
           ))
         )}
       </main>
+      </>
       )}
     </div>
   )
