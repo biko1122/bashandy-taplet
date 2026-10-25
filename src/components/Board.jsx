@@ -17,6 +17,7 @@ import AdminComplaints from './AdminComplaints'
 import Inbox from './Inbox'
 import AdminRiders from './AdminRiders'
 import AdminPrices from './AdminPrices'
+import AdminUsers from './AdminUsers'
 import OrderCard from './OrderCard'
 import logo from '../logo-emblem.png'
 
@@ -380,6 +381,13 @@ export default function Board({ user, onLogout }) {
               >
                 {view === 'prices' ? '📋 الأوردرات' : '💰 الأسعار'}
               </button>
+              <button
+                type="button"
+                className={`tool tool--wide ${view === 'users' ? 'is-on' : ''}`}
+                onClick={() => setView(view === 'users' ? 'orders' : 'users')}
+              >
+                {view === 'users' ? '📋 الأوردرات' : '👤 الحسابات'}
+              </button>
             </>
           ) : null}
 
@@ -446,6 +454,8 @@ export default function Board({ user, onLogout }) {
         <AdminComplaints onFlash={setFlash} />
       ) : view === 'inbox' ? (
         <Inbox onCountChange={setWaitingChats} />
+      ) : view === 'users' ? (
+        <AdminUsers me={user} onFlash={setFlash} />
       ) : view === 'riders' ? (
         <AdminRiders user={user} onFlash={setFlash} onChange={loadRiders} />
       ) : (

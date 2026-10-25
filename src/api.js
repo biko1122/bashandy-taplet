@@ -149,6 +149,20 @@ export const fetchRiders = (all = false) => request(`/api/delivery${all ? '?all=
 export const addRider = (name, phone) =>
   request('/api/delivery', { method: 'POST', body: { name, phone } })
 
+/* ---------------------------- حسابات الموظفين ---------------------------- */
+/* كلها للأدمن بس — السيرفر بيرفض أي طلب منهم من حساب موظف */
+
+export const fetchUsers = () => request('/api/users')
+
+export const addUser = (name, email, password, role = 'STAFF') =>
+  request('/api/users', { method: 'POST', body: { name, email, password, role } })
+
+export const updateUser = (id, patch) =>
+  request(`/api/users/${id}`, { method: 'PATCH', body: patch })
+
+export const resetUserPassword = (id, newPassword) =>
+  request(`/api/users/${id}/password`, { method: 'POST', body: { newPassword } })
+
 /* حاضر / غايب — أي موظف يقدر يدوسه، مش الأدمن بس */
 export const setRiderPresence = (id, isPresent) =>
   request(`/api/delivery/${id}/presence`, { method: 'PATCH', body: { isPresent } })

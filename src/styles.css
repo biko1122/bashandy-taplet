@@ -1785,3 +1785,132 @@ a {
 .rider__here:focus-visible { outline: 2.5px solid var(--gold); outline-offset: 2px; }
 .btn--rider-away { opacity: 0.55; }
 .btn--rider-away small { font-weight: 400; }
+
+/* ========================================================================= */
+/*  حسابات الموظفين                                                          */
+/* ========================================================================= */
+.users { padding: 14px; display: grid; gap: 14px; max-width: 680px; margin-inline: auto; }
+
+/* الباسورد بيتعرض مرة واحدة بس — لازم يخطف العين */
+.users__shown {
+  background: #fff7ed;
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: grid;
+  gap: 8px;
+}
+.users__shown > b { color: #92400e; }
+.users__shown > div { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.users__shown code {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 5px 10px;
+  font-size: 1rem;
+  user-select: all;
+}
+.users__shown button {
+  justify-self: start;
+  font: inherit;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 9px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.users__form {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+}
+.users__form h2 { margin: 0 0 10px; font-size: 1.05rem; }
+.users__form small { display: block; margin-top: 8px; color: var(--muted-text); line-height: 1.6; }
+.users__fields { display: flex; gap: 8px; flex-wrap: wrap; }
+.users__fields input,
+.users__fields select {
+  flex: 1 1 170px;
+  min-width: 0;
+  font: inherit;
+  padding: 9px 11px;
+  border-radius: 9px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg);
+  color: var(--text);
+}
+.users__fields select { flex: 0 0 110px; }
+.users__fields button {
+  font: inherit;
+  font-weight: 700;
+  padding: 9px 18px;
+  border-radius: 9px;
+  border: 0;
+  background: var(--brand);
+  color: #fff;
+  cursor: pointer;
+}
+.users__fields button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.users__list { display: grid; gap: 8px; }
+.users__list h3 { margin: 6px 0 2px; font-size: 0.95rem; color: var(--muted-text); }
+
+.urow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 10px 12px;
+}
+.urow--off { opacity: 0.55; }
+.urow__who { display: grid; gap: 2px; min-width: 0; }
+.urow__who small { color: var(--muted-text); font-size: 0.8rem; }
+.urow__role {
+  margin-inline-start: 7px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 99px;
+  vertical-align: middle;
+}
+.urow__role--admin { background: var(--gold); color: #fff; }
+.urow__role--staff { background: var(--muted); color: var(--muted-text); }
+.urow__me { margin-inline-start: 6px; font-size: 0.72rem; color: var(--muted-text); }
+
+.urow__actions, .urow__reset { display: flex; gap: 7px; align-items: center; flex-wrap: wrap; }
+.urow__actions button, .urow__reset button {
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 9px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-2);
+  color: var(--text-soft);
+  cursor: pointer;
+}
+.urow__stop { border-color: #b91c1c !important; color: #b91c1c !important; }
+.urow__start { border-color: #15803d !important; color: #15803d !important; }
+.urow__ghost { opacity: 0.7; }
+.urow__reset input {
+  font: inherit;
+  padding: 7px 10px;
+  border-radius: 9px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg);
+  color: var(--text);
+  width: 200px;
+}
+
+.users__note {
+  color: var(--muted-text);
+  font-size: 0.85rem;
+  line-height: 1.7;
+  margin: 0;
+}
