@@ -5,13 +5,20 @@
  *  للأدمن بس: مين بيشتغل توصيل دلوقتي. الأسماء دي بتظهر للموظف لما
  *  يدوس "خرج من المطعم"، والزبون بياخد اسم المندوب ورقمه على الواتساب.
  *
- *  ⚠️ المندوب اللي مشي **بيتقفل مش بيتمسح** — اسمه مكتوب على أوردرات
- *     قديمة، والمسح كان هيضيّعه من السجل.
+ *  فيه حاجتين مختلفين والفرق بينهم مهم:
+ *    • **إيقاف** — المندوب اللي مشي أو واخد أجازة طويلة. بيتخفي من
+ *      القايمة وبيفضل موجود، فالمدير يرجّعه بنفس الرقم في أي وقت.
+ *      ده اللي بيتستعمل في أغلب الوقت.
+ *    • **مسح** — الكارت نفسه غلط: رقم اتكتب خطأ، اسم اتسجّل مرتين،
+ *      حد اتضاف بالغلط. بيشيله من الداتا خلاص.
+ *
+ *  والمسح مش بيأذي السجل: اسم المندوب ورقمه متخزّنين **نسخة** جوه كل
+ *  أوردر وقت التسليم، فالأوردرات القديمة تفضل مكتوب عليها نفس الاسم.
  * ==========================================================================
  */
 
 import { useCallback, useEffect, useState } from 'react'
-import { fetchRiders, addRider, updateRider, setRiderPresence } from '../api'
+import { fetchRiders, addRider, updateRider, setRiderPresence, deleteRider } from '../api'
 
 const displayPhone = (phone) => {
   if (phone?.startsWith('20') && phone.length === 12) {
@@ -27,6 +34,8 @@ export default function AdminRiders({ user, onFlash, onChange }) {
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [busy, setBusy] = useState(false)
+  /* المندوب اللي المدير دوس على سلّته ولسه مأكّدش */
+  const [confirming, setConfirming] = useState(null)
 
   const load = useCallback(
     () =>
@@ -39,6 +48,16 @@ export default function AdminRiders({ user, onFlash, onChange }) {
   useEffect(() => {
     load()
   }, [load])
+
+  /* السؤال بيختفي لوحده. الشاشة في مطبخ، والمدير بيسيبها في نص
+     الكلام — زرار «امسحه خلاص» مينفعش يفضل مستني حد يعدّي إيده.
+     ٨ ثواني: وقت كفاية يقرا السؤال ويقرر، وقصير كفاية ميفضلش
+     مفتوح. (٥ كانت بتقفل عليه وهو لسه بيقرا.) */
+  useEffect(() => {
+    if (!confirming) return undefined
+    const timer = setTimeout(() => setConfirming(null), 8000)
+    return () => clearTimeout(timer)
+  }, [confirming])
 
   const submit = async (event) => {
     event.preventDefault()
@@ -81,6 +100,54 @@ export default function AdminRiders({ user, onFlash, onChange }) {
       setRiders((list) => list.map((r) => (r.id === rider.id ? { ...r, isPresent: !next } : r)))
       onFlash?.({ kind: 'err', text: error.message })
     }
+  }
+
+  const remove = async (rider) => {
+    setConfirming(null)
+    try {
+      const result = await deleteRider(rider.id)
+      await load()
+      onChange?.()
+      /* بنقول عدد الأوردرات القديمة عن قصد — المدير لازم يعرف إن
+         السجل متأثرش، وإلا يفتكر إنه ضيّع تاريخ المندوب. */
+      const old = result.data?.orders ?? 0
+      onFlash?.({
+        kind: 'ok',
+        text: old
+          ? `${rider.name} اتمسح — و${old} أوردر قديم لسه مكتوب عليهم اسمه`
+          : `${rider.name} اتمسح`,
+      })
+    } catch (error) {
+      onFlash?.({ kind: 'err', text: error.message })
+    }
+  }
+
+  /* خطوتين عن قصد: دي شاشة لمس وزراراها كبيرة، ودوسة بالغلط هنا
+     بتشيل كارت مش بترجع. */
+  const removeControls = (rider) => {
+    if (!canManage) return null
+    if (confirming !== rider.id) {
+      return (
+        <button
+          type="button"
+          className="rider__del"
+          aria-label={`امسح ${rider.name}`}
+          onClick={() => setConfirming(rider.id)}
+        >
+          امسح
+        </button>
+      )
+    }
+    return (
+      <>
+        <button type="button" className="rider__kill" onClick={() => remove(rider)}>
+          امسحه خلاص
+        </button>
+        <button type="button" className="rider__keep" onClick={() => setConfirming(null)}>
+          لأ
+        </button>
+      </>
+    )
   }
 
   const active = riders.filter((r) => r.isActive)
@@ -131,20 +198,29 @@ export default function AdminRiders({ user, onFlash, onChange }) {
                   <b>{rider.name}</b>
                   <small dir="ltr">{displayPhone(rider.phone)}</small>
                 </div>
+                {/* وهو بيسأل «متأكد؟» بنخفي باقي الزراير — الصف ضيّق،
+                    وزرار جنب السؤال بيتدوس بالغلط. */}
                 <div className="rider__actions">
-                  <button
-                    type="button"
-                    className={`rider__here ${rider.isPresent ? 'is-on' : ''}`}
-                    aria-pressed={Boolean(rider.isPresent)}
-                    onClick={() => togglePresence(rider)}
-                  >
-                    {rider.isPresent ? '✓ حاضر' : 'غايب'}
-                  </button>
-                  {canManage ? (
-                    <button type="button" className="rider__stop" onClick={() => toggle(rider)}>
-                      إيقاف
-                    </button>
-                  ) : null}
+                  {confirming === rider.id ? (
+                    removeControls(rider)
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        className={`rider__here ${rider.isPresent ? 'is-on' : ''}`}
+                        aria-pressed={Boolean(rider.isPresent)}
+                        onClick={() => togglePresence(rider)}
+                      >
+                        {rider.isPresent ? '✓ حاضر' : 'غايب'}
+                      </button>
+                      {canManage ? (
+                        <button type="button" className="rider__stop" onClick={() => toggle(rider)}>
+                          إيقاف
+                        </button>
+                      ) : null}
+                      {removeControls(rider)}
+                    </>
+                  )}
                 </div>
               </div>
             ))}
@@ -160,11 +236,24 @@ export default function AdminRiders({ user, onFlash, onChange }) {
                   <b>{rider.name}</b>
                   <small dir="ltr">{displayPhone(rider.phone)}</small>
                 </div>
-                {canManage ? (
-                  <button type="button" className="rider__start" onClick={() => toggle(rider)}>
-                    رجّعه
-                  </button>
-                ) : null}
+                <div className="rider__actions">
+                  {confirming === rider.id ? (
+                    removeControls(rider)
+                  ) : (
+                    <>
+                      {canManage ? (
+                        <button
+                          type="button"
+                          className="rider__start"
+                          onClick={() => toggle(rider)}
+                        >
+                          رجّعه
+                        </button>
+                      ) : null}
+                      {removeControls(rider)}
+                    </>
+                  )}
+                </div>
               </div>
             ))}
           </>

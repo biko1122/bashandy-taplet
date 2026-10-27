@@ -174,6 +174,9 @@ export const resetCounter = () => request('/api/orders/counter/reset', { method:
 export const updateRider = (id, patch) =>
   request(`/api/delivery/${id}`, { method: 'PATCH', body: patch })
 
+/* مسح المندوب خلاص (مدير بس) — السجل القديم بيفضل باسمه */
+export const deleteRider = (id) => request(`/api/delivery/${id}`, { method: 'DELETE' })
+
 /* ------------------------ لوحة الأسعار (أدمن بس) ------------------------ */
 
 /** المنيو كامل بكل الأصناف (حتى الموقوفة) — للوحة الأسعار */

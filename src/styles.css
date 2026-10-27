@@ -1701,6 +1701,47 @@ a {
   cursor: pointer;
 }
 
+/* «امسح» باهتة جنب «حاضر» و«إيقاف» — دي مش حاجة بتتدوس كل يوم،
+   فمش المفروض تشد العين، بس لازم تبان وتتقري.
+   (كانت أيقونة سلّة — مكانتش باينة خالص على شاشة التابلت، وباقي
+   الشاشة كلها كلام مش رموز.) */
+.rider__del {
+  padding: 7px 12px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  background: none;
+  color: var(--muted-text);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.rider__del:hover, .rider__del:focus-visible {
+  color: #b91c1c;
+  border-color: #b91c1c;
+  border-style: solid;
+}
+
+/* ولما يسأل «متأكد؟» بالعكس — أحمر صريح، عشان محدش يدوس وهو سرحان */
+.rider__kill {
+  padding: 7px 14px;
+  border: 1px solid #991b1b;
+  border-radius: var(--radius);
+  background: #b91c1c;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.rider__keep {
+  padding: 7px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
 /* ========================================================================= */
 /*  السيرفر مش راد                                                            */
 /* ========================================================================= */
